@@ -12,18 +12,8 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 
-interface SubmissionResult {
-  _id: string;
-  userId: string;
-  problemId: string;
-  code: string;
-  language: string;
-  status: string;
-  executionTime?: number;
-  memoryUsed?: number;
-  createdAt: string;
-  updatedAt: string;
-}
+// Import the correct SubmissionResult interface from api/index.ts
+import type { SubmissionResult } from '@/api';
 
 const STATUS_POLLING_INTERVAL = 3000; // Poll every 3 seconds
 
@@ -118,13 +108,16 @@ export default function SubmissionDetailPage() {
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <p className="font-medium">Problem ID:</p>
-              <p>{typeof submission.problemId === "object" ? submission.problemId.title : submission.problemId}</p>
-
+              <p className="font-medium">Problem:</p>
+              <p>{submission.problemId.title}</p>
             </div>
             <div>
               <p className="font-medium">Language:</p>
               <p>{submission.language}</p>
+            </div>
+            <div>
+              <p className="font-medium">User:</p>
+              <p>{submission.userId.username}</p>
             </div>
             {submission.executionTime !== undefined && (
               <div>

@@ -31,6 +31,7 @@ interface UserData {
 }
 
 interface ProblemData {
+  _id?: string; // Add _id as optional for creation, but present on fetch
   title: string;
   description: string;
   difficulty: string;
@@ -45,10 +46,16 @@ interface SubmissionData {
   language: string;
 }
 
-interface SubmissionResult {
+export interface SubmissionResult {
   _id: string;
-  userId: string;
-  problemId: string;
+  userId: {
+    _id: string;
+    username: string;
+  };
+  problemId: {
+    _id: string;
+    title: string;
+  };
   code: string;
   language: string;
   status: string;
@@ -56,6 +63,7 @@ interface SubmissionResult {
   memoryUsed?: number;
   createdAt: string;
   updatedAt: string;
+  __v: number;
 }
 
 // Auth calls
