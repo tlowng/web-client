@@ -9,12 +9,11 @@ const api = axios.create({
   },
 });
 
-// Add a request interceptor to include the token
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
     if (token) {
-      config.headers['x-auth-token'] = token; // Use x-auth-token as per backend
+      config.headers['x-auth-token'] = token; 
     }
     return config;
   },
@@ -23,7 +22,7 @@ api.interceptors.request.use(
   }
 );
 
-// Basic types for API responses (you might want to expand these)
+// Basic types for API responses 
 interface UserData {
   username?: string;
   email: string;

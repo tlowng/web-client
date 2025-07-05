@@ -11,7 +11,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useToast } from '@/components/ui/use-toast';
+import { toast } from 'sonner'; 
 
 export default function RegisterPage() {
   const [username, setUsername] = useState('');
@@ -19,23 +19,20 @@ export default function RegisterPage() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     try {
       await registerUser({ username, email, password });
-      toast({
-        title: 'Registration Successful',
+      toast.success('Registration Successful', {
         description: 'Your account has been created. Please log in.',
       });
-      navigate('/login'); // Redirect to login page after successful registration
+      navigate('/login');
     } catch (error: any) {
-      toast({
-        title: 'Registration Failed',
-        description: error.response?.data?.message || 'An error occurred during registration.',
-        variant: 'destructive',
+      toast.error('Registration Failed', {
+        description:
+          error.response?.data?.message || 'An error occurred during registration.',
       });
       console.error('Registration error:', error);
     } finally {
@@ -48,7 +45,9 @@ export default function RegisterPage() {
       <Card className="w-full max-w-sm">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl">Register</CardTitle>
-          <CardDescription>Enter your details below to create an account.</CardDescription>
+          <CardDescription>
+            Enter your details below to create an account.
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="grid gap-4">
@@ -89,7 +88,7 @@ export default function RegisterPage() {
             </Button>
           </form>
           <div className="mt-4 text-center text-sm">
-            Already have an account?{" "}
+            Already have an account?{' '}
             <Link to="/login" className="underline">
               Login
             </Link>

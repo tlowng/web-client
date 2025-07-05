@@ -5,32 +5,31 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useToast } from '@/components/ui/use-toast';
+import { toast } from 'sonner'; 
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     try {
       const response = await loginUser({ email, password });
-      localStorage.setItem('token', response.data.token); // Assuming backend returns { token: '...' }
-      toast({
-        title: 'Login Successful',
+      localStorage.setItem('token', response.data.token);
+
+      toast.success('Login Successful', {
         description: 'Welcome back!',
       });
-      navigate('/problems'); // Redirect to problems page after login
+
+      navigate('/problems');
     } catch (error: any) {
-      toast({
-        title: 'Login Failed',
+      toast.error('Login Failed', {
         description: error.response?.data?.message || 'Invalid credentials.',
-        variant: 'destructive',
       });
+
       console.error('Login error:', error);
     } finally {
       setLoading(false);
@@ -72,7 +71,7 @@ export default function LoginPage() {
             </Button>
           </form>
           <div className="mt-4 text-center text-sm">
-            Don't have an account?{" "}
+            Don't have an account?{' '}
             <Link to="/register" className="underline">
               Sign up
             </Link>

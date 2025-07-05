@@ -119,7 +119,8 @@ export default function SubmissionDetailPage() {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <p className="font-medium">Problem ID:</p>
-              <p>{submission.problemId}</p>
+              <p>{typeof submission.problemId === "object" ? submission.problemId.title : submission.problemId}</p>
+
             </div>
             <div>
               <p className="font-medium">Language:</p>

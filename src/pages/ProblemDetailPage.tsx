@@ -3,10 +3,10 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { getProblemById, submitCode } from '@/api';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/input'; // Re-using input for Textarea
+import { Textarea } from '@/components/ui/textarea'; // Re-using input for Textarea
 import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useToast } from '@/components/ui/use-toast';
+import { toast } from 'sonner';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import MonacoEditor from '@monaco-editor/react';
 
@@ -23,7 +23,6 @@ interface Problem {
 export default function ProblemDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { toast } = useToast();
   const [problem, setProblem] = useState<Problem | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -62,22 +61,20 @@ export default function ProblemDetailPage() {
         language,
       };
       const response = await submitCode(submissionData);
-      toast({
-        title: 'Submission Successful',
-        description: `Your submission ${response.data.submissionId} has been queued.`, 
+      toast.success('Submission Successful', {
+        description: `Your submission ${response.data.submissionId} has been queued.`,
       });
-      navigate(`/submissions/${response.data.submissionId}`); // Redirect to submission status page
+      navigate(`/submissions/${response.data.submissionId}`);
     } catch (err) {
-      toast({
-        title: 'Submission Failed',
+      toast.error('Submission Failed', {
         description: 'There was an error submitting your code.',
-        variant: 'destructive',
       });
       console.error(err);
     } finally {
       setIsSubmitting(false);
     }
   };
+
 
   if (error) {
     return <div className="p-4 text-red-500">Error: {error}</div>;
