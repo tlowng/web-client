@@ -22,6 +22,10 @@ import ProblemDetailPage from './pages/ProblemDetailPage';
 import SubmissionDetailPage from './pages/SubmissionDetailPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
+import ForumPage from './pages/ForumPage';
+import UserSubmissionsPage from './pages/UserSubmissionsPage';
+import MembersPage from './pages/MembersPage';
+import GroupsPage from './pages/GroupsPage';
 
 export default function App() {
   return (
@@ -53,12 +57,17 @@ export default function App() {
           </header>
           <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
             <Routes>
-              <Route path="/" element={<ProblemsPage />} />
+            <Route path="/" element={<ForumPage />} />
               <Route path="/problems" element={<ProblemsPage />} />
               <Route path="/problems/:id" element={<ProblemDetailPage />} />
+              {/* New route for user submissions */}
+              <Route path="/submissions/user-submissions" element={<UserSubmissionsPage />} />
               <Route path="/submissions/:id" element={<SubmissionDetailPage />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<RegisterPage />} />
+              {/* New routes for members and groups */}
+              <Route path="/members" element={<MembersPage />} />
+              <Route path="/groups" element={<GroupsPage />} />
             </Routes>
           </div>
         </SidebarInset>
