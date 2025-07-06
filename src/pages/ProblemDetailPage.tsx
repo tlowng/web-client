@@ -24,9 +24,12 @@ export default function ProblemDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
+  console.log('Problem ID from URL params:', id); // Log the ID
+
   // Use the custom useFetch hook for problem details
   // We need to wrap getProblemById(id) in a function for useFetch
   const fetchProblemDetails = () => {
+    console.log('Calling fetchProblemDetails with ID:', id); // Log when fetcher is called
     if (!id) {
       // This case should ideally be handled by routing, or a more robust initial check
       // For now, we can throw an error or return a rejected promise.
