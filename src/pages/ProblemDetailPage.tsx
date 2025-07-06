@@ -3,12 +3,12 @@ import { getProblemById, submitCode } from '@/api';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Skeleton }n from '@/components/ui/skeleton';
 import { toast } from 'sonner';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import MonacoEditor from '@monaco-editor/react';
-import { useState } from 'react';
-import { useFetch } from '@/hooks/use-fetch'; // Import the new hook
+import { useState, useCallback } from 'react'; // Import useCallback
+import { useFetch } from '@/hooks/use-fetch';
 
 interface Problem {
   _id: string;
@@ -26,19 +26,18 @@ export default function ProblemDetailPage() {
 
   console.log('Problem ID from URL params:', id); // Log the ID
 
-  // Use the custom useFetch hook for problem details
-  // We need to wrap getProblemById(id) in a function for useFetch
-  const fetchProblemDetails = () => {
+  // Wrap fetchProblemDetails in useCallback
+  const fetchProblemDetails = useCallback(() => {
     console.log('Calling fetchProblemDetails with ID:', id); // Log when fetcher is called
     if (!id) {
-      // This case should ideally be handled by routing, or a more robust initial check
-      // For now, we can throw an error or return a rejected promise.
       return Promise.reject(new Error('Problem ID is missing.'));
     }
     return getProblemById(id);
-  };
+  }, [id]); // Depend on id
 
   const { data: problem, loading, error } = useFetch<Problem>(fetchProblemDetails);
+
+  console.log('ProblemDetailPage render - problem:', problem, 'loading:', loading, 'error:', error); // Added detailed log
 
   const [code, setCode] = useState<string>('// Write your code here');
   const [language, setLanguage] = useState<string>('cpp'); // Default language

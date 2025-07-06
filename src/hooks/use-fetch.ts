@@ -16,19 +16,23 @@ export function useFetch<T>(fetcher: () => Promise<any>, initialData: T | null =
     setError(null);
     try {
       const response = await fetcher();
-      console.log("Raw response in useFetch:", response); // Added log
+      console.log("useFetch: Fetched data successfully:", response.data); // New log for successful fetch
       setData(response.data);
     } catch (err: any) {
-      console.error("Failed to fetch data:", err);
+      console.error("useFetch: Failed to fetch data:", err); // New log for error
       setError(err.response?.data?.message || err.message || 'An unexpected error occurred.');
     } finally {
+      console.log("useFetch: Fetching complete. Loading:", false); // New log for loading state
       setLoading(false);
     }
   }, [fetcher]);
 
   useEffect(() => {
+    console.log("useFetch: useEffect triggered."); // New log for useEffect trigger
     fetchData();
   }, [fetchData]);
+
+  console.log("useFetch: Current state - data:", data, ", loading:", loading, ", error:", error); // New log for current state
 
   return { data, loading, error };
 }
