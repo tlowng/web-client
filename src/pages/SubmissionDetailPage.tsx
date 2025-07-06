@@ -12,10 +12,9 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 
-// Import the correct SubmissionResult interface from api/index.ts
 import type { SubmissionResult } from '@/api';
 
-const STATUS_POLLING_INTERVAL = 3000; // Poll every 3 seconds
+const STATUS_POLLING_INTERVAL = 3000; 
 
 export default function SubmissionDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -37,30 +36,28 @@ export default function SubmissionDetailPage() {
         const response = await getSubmissionById(id);
         setSubmission(response.data);
 
-        // Stop polling if status is final
         if (!['In Queue', 'Judging', 'Pending'].includes(response.data.status)) {
           clearInterval(intervalId);
         }
       } catch (err) {
         setError('Failed to fetch submission details.');
         console.error(err);
-        clearInterval(intervalId); // Stop polling on error
+        clearInterval(intervalId); 
       } finally {
         setLoading(false);
       }
     };
 
-    fetchSubmission(); // Initial fetch
+    fetchSubmission(); 
     intervalId = setInterval(fetchSubmission, STATUS_POLLING_INTERVAL);
 
-    // Cleanup on component unmount
     return () => clearInterval(intervalId);
   }, [id]);
 
   const getStatusVariant = (status: string) => {
     switch (status) {
       case 'Accepted':
-        return 'default'; // or 'success' if you define one
+        return 'default'; 
       case 'Wrong Answer':
       case 'Time Limit Exceeded':
       case 'Runtime Error':
