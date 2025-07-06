@@ -81,8 +81,7 @@ export default function ProblemsPage() {
                     <TableHead>Title</TableHead>
                     <TableHead className="text-center">Difficulty</TableHead>
                   </TableRow>
-                </TableHeader>
-                <TableBody>
+                </TableHeader><TableBody>
                   {filteredProblems?.map((problem) => (
                     <TableRow key={problem._id}>
                       <TableCell className="font-mono text-xs text-muted-foreground">{problem._id.slice(0, 8)}</TableCell>
