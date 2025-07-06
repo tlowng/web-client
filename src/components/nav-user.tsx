@@ -1,7 +1,5 @@
-"use client"
-
 import * as React from "react"
-import { Link, useNavigate } from "react-router-dom" // Import Link and useNavigate
+import { Link, useNavigate } from "react-router-dom"
 import {
   BadgeCheck,
   Bell,
@@ -9,6 +7,7 @@ import {
   CreditCard,
   LogOut,
   Sparkles,
+  Loader2, // Import Loader2 for loading state
 } from "lucide-react"
 
 import {
@@ -31,40 +30,59 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
-import { Button } from "@/components/ui/button" // Import Button for login/register
-
-interface User {
-  name: string
-  email: string
-  avatar: string
-}
+import { Button } from "@/components/ui/button"
+import { getMe, UserProfile } from "@/api"; // Import getMe and UserProfile
 
 export function NavUser() {
   const { isMobile } = useSidebar()
   const navigate = useNavigate()
-  const [currentUser, setCurrentUser] = React.useState<User | null>(null) // State to hold user info
+  const [currentUser, setCurrentUser] = React.useState<UserProfile | null>(null)
+  const [loading, setLoading] = React.useState(true); // Add loading state
 
-  // Simulate fetching user info based on token
   React.useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      // In a real app, you would decode the token or fetch user details from an API
-      // For now, let's mock a user if a token exists
-      setCurrentUser({
-        name: "Current User", // Replace with actual user name from token/API
-        email: "user@example.com", // Replace with actual user email
-        avatar: "/avatars/user.jpg", // Placeholder avatar
-      });
-    } else {
-      setCurrentUser(null);
-    }
-  }, []);
+    const fetchUser = async () => {
+      setLoading(true);
+      const token = localStorage.getItem('token');
+      if (token) {
+        try {
+          const response = await getMe();
+          setCurrentUser(response.data);
+        } catch (error: any) {
+          console.error("Failed to fetch user data:", error);
+          // If token is invalid or expired, clear it and redirect to login
+          if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+            localStorage.removeItem('token');
+            setCurrentUser(null);
+            navigate('/login');
+          }
+        }
+      } else {
+        setCurrentUser(null);
+      }
+      setLoading(false);
+    };
+
+    fetchUser();
+  }, [navigate]); // Add navigate to dependency array
 
   const handleLogout = () => {
     localStorage.removeItem('token');
     setCurrentUser(null);
-    navigate('/login'); // Redirect to login page after logout
+    navigate('/login');
   };
+
+  if (loading) {
+    return (
+      <SidebarMenu>
+        <SidebarMenuItem>
+          <SidebarMenuButton size="lg" className="w-full justify-center">
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            Loading user...
+          </SidebarMenuButton>
+        </SidebarMenuItem>
+      </SidebarMenu>
+    );
+  }
 
   return (
     <SidebarMenu>
@@ -77,11 +95,11 @@ export function NavUser() {
                 className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
               >
                 <Avatar className="h-8 w-8 rounded-lg">
-                  <AvatarImage src={currentUser.avatar} alt={currentUser.name} />
-                  <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                  <AvatarImage src={currentUser.avatar || "/avatars/user.jpg"} alt={currentUser.username} />
+                  <AvatarFallback className="rounded-lg">{currentUser.username ? currentUser.username.charAt(0).toUpperCase() : ''}</AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">{currentUser.name}</span>
+                  <span className="truncate font-medium">{currentUser.username}</span>
                   <span className="truncate text-xs">{currentUser.email}</span>
                 </div>
                 <ChevronsUpDown className="ml-auto size-4" />
@@ -96,11 +114,11 @@ export function NavUser() {
               <DropdownMenuLabel className="p-0 font-normal">
                 <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                   <Avatar className="h-8 w-8 rounded-lg">
-                    <AvatarImage src={currentUser.avatar} alt={currentUser.name} />
-                    <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                    <AvatarImage src={currentUser.avatar || "/avatars/user.jpg"} alt={currentUser.username} />
+                    <AvatarFallback className="rounded-lg">{currentUser.username ? currentUser.username.charAt(0).toUpperCase() : ''}</AvatarFallback>
                   </Avatar>
                   <div className="grid flex-1 text-left text-sm leading-tight">
-                    <span className="truncate font-medium">{currentUser.name}</span>
+                    <span className="truncate font-medium">{currentUser.username}</span>
                     <span className="truncate text-xs">{currentUser.email}</span>
                   </div>
                 </div>

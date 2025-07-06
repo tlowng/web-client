@@ -66,6 +66,14 @@ export interface SubmissionResult {
   __v: number;
 }
 
+// Define a type for the user profile data returned from the backend
+export interface UserProfile {
+  _id: string;
+  username: string;
+  email: string;
+  role: string;
+}
+
 // Auth calls
 export const registerUser = (userData: UserData) => api.post('/auth/signup', userData);
 export const loginUser = (credentials: UserData) => api.post('/auth/login', credentials);
@@ -79,3 +87,6 @@ export const createProblem = (problemData: ProblemData) => api.post('/problems',
 export const submitCode = (submissionData: SubmissionData) => api.post<{ submissionId: string }>('/submissions', submissionData);
 export const getSubmissionById = (id: string) => api.get<SubmissionResult>(`/submissions/${id}`);
 export const getUserSubmissions = () => api.get<SubmissionResult[]>('/submissions/user-submissions');
+
+// User Profile call
+export const getMe = () => api.get<UserProfile>('/auth/me'); // Assuming /auth/me or similar endpoint exists
