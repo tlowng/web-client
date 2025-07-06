@@ -1,14 +1,14 @@
-import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getProblemById, submitCode } from '@/api';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea'; // Re-using input for Textarea
 import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import MonacoEditor from '@monaco-editor/react';
+import { useState } from 'react';
+import { useFetch } from '@/hooks/use-fetch'; // Import the new hook
 
 interface Problem {
   _id: string;
@@ -23,33 +23,23 @@ interface Problem {
 export default function ProblemDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [problem, setProblem] = useState<Problem | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+
+  // Use the custom useFetch hook for problem details
+  // We need to wrap getProblemById(id) in a function for useFetch
+  const fetchProblemDetails = () => {
+    if (!id) {
+      // This case should ideally be handled by routing, or a more robust initial check
+      // For now, we can throw an error or return a rejected promise.
+      return Promise.reject(new Error('Problem ID is missing.'));
+    }
+    return getProblemById(id);
+  };
+
+  const { data: problem, loading, error } = useFetch<Problem>(fetchProblemDetails);
+
   const [code, setCode] = useState<string>('// Write your code here');
   const [language, setLanguage] = useState<string>('cpp'); // Default language
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  useEffect(() => {
-    const fetchProblem = async () => {
-      if (!id) {
-        setError('Problem ID is missing.');
-        setLoading(false);
-        return;
-      }
-      try {
-        const response = await getProblemById(id);
-        setProblem(response.data);
-      } catch (err) {
-        setError('Failed to fetch problem details.');
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProblem();
-  }, [id]);
 
   const handleSubmit = async () => {
     if (!problem || !id) return;
@@ -74,7 +64,6 @@ export default function ProblemDetailPage() {
       setIsSubmitting(false);
     }
   };
-
 
   if (error) {
     return <div className="p-4 text-red-500">Error: {error}</div>;

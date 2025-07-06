@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getProblems } from '@/api';
 import {
@@ -11,6 +10,7 @@ import {
 } from '@/components/ui/table';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useFetch } from '@/hooks/use-fetch'; // Import the new hook
 
 interface Problem {
   _id: string;
@@ -19,25 +19,8 @@ interface Problem {
 }
 
 export default function ProblemsPage() {
-  const [problems, setProblems] = useState<Problem[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const fetchProblems = async () => {
-      try {
-        const response = await getProblems();
-        setProblems(response.data);
-      } catch (err) {
-        setError('Failed to fetch problems.');
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProblems();
-  }, []);
+  // Use the custom useFetch hook
+  const { data: problems, loading, error } = useFetch<Problem[]>(getProblems, []);
 
   if (error) {
     return <div className="p-4 text-red-500">Error: {error}</div>;
@@ -56,7 +39,7 @@ export default function ProblemsPage() {
               <Skeleton className="h-10 w-full" />
               <Skeleton className="h-10 w-full" />
             </div>
-          ) : problems.length === 0 ? (
+          ) : problems && problems.length === 0 ? (
             <p className="text-center text-muted-foreground">No problems found.</p>
           ) : (
             <Table>
@@ -68,7 +51,7 @@ export default function ProblemsPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {problems.map((problem) => (
+                {problems?.map((problem) => (
                   <TableRow key={problem._id}>
                     <TableCell className="font-medium">{problem._id.slice(0, 7)}...</TableCell>
                     <TableCell>
