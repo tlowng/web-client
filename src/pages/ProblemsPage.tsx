@@ -60,7 +60,7 @@ export default function ProblemsPage() {
         onChange={(e) => setSearchTerm(e.target.value)}
       />
 
-      <Card>
+      <Card className="w-full"> {/* Added w-full here */}
         <CardHeader>
           <CardTitle>Problems</CardTitle>
         </CardHeader>
@@ -74,8 +74,8 @@ export default function ProblemsPage() {
           ) : filteredProblems && filteredProblems.length === 0 ? (
             <p className="text-center text-muted-foreground">No problems found matching your search.</p>
           ) : (
-            <div className="overflow-x-auto"> {/* Added overflow-x-auto for responsiveness */}
-              <Table className="min-w-full"> {/* Added min-w-full to ensure it takes full width */}
+            <div className="overflow-x-auto">
+              <Table className="min-w-full">
                 <TableHeader>
                   <TableRow>
                     <TableHead className="w-[100px]">ID</TableHead>
