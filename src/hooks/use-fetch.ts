@@ -16,6 +16,7 @@ export function useFetch<T>(fetcher: () => Promise<any>, initialData: T | null =
     setError(null);
     try {
       const response = await fetcher();
+      console.log("Raw response in useFetch:", response); // Added log
       setData(response.data);
     } catch (err: any) {
       console.error("Failed to fetch data:", err);
