@@ -9,7 +9,8 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Skeleton }
+ from '@/components/ui/skeleton';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -25,7 +26,9 @@ export default function ProblemsPage() {
   const { data: problems, loading, error } = useFetch<Problem[]>(getProblems, []);
   const [searchTerm, setSearchTerm] = useState('');
 
-  const getDifficultyVariant = (difficulty: string) => {
+  const getDifficultyVariant = (difficulty: string | undefined | null) => {
+    if (!difficulty) return 'outline'; // Handle undefined or null difficulty
+
     switch (difficulty.toLowerCase()) {
       case 'easy':
         return 'default';
