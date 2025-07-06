@@ -31,7 +31,8 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 import { Button } from "@/components/ui/button"
-import { getMe, UserProfile } from "@/api"; // Import getMe and UserProfile
+import { getMe } from "@/api"; // Import getMe and UserProfile
+import type { UserProfile } from "@/api";
 
 export function NavUser() {
   const { isMobile } = useSidebar()

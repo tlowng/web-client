@@ -89,4 +89,4 @@ export const getSubmissionById = (id: string) => api.get<SubmissionResult>(`/sub
 export const getUserSubmissions = () => api.get<SubmissionResult[]>('/submissions/user-submissions');
 
 // User Profile call
-export const getMe = () => api.get<UserProfile>('/auth/me'); // Assuming /auth/me or similar endpoint exists
+export const getMe = () => api.get<UserProfile>('/auth/me');
