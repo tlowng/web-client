@@ -11,7 +11,7 @@
   "compilerOptions": {
     "baseUrl": ".",
     "skipLibCheck": true,       
-    "allowJsx": true,    
+    "allowJs": true,    
     "paths": {
       "@/*": ["./src/*"]
     }

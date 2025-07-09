@@ -72,6 +72,7 @@ export interface UserProfile {
   username: string;
   email: string;
   role: string;
+  avatar?: string;
 }
 
 // Auth calls
