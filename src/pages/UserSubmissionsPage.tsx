@@ -35,6 +35,7 @@ export default function UserSubmissionsPage() {
       case 'Accepted':
         return 'text-green-600 dark:text-green-400';
       case 'Wrong Answer':
+        return 'text-red-600 dark:text-red-400';
       case 'Time Limit Exceeded':
       case 'Runtime Error':
       case 'Compilation Error':
@@ -117,8 +118,8 @@ export default function UserSubmissionsPage() {
 
   return (
     <div className="space-y-6">
-      <Card>
-        <CardHeader>
+      <Card className='border-0 p-5 shadow-none'>
+        <CardHeader className='p-1'>
           <div className="flex items-center justify-between">
             <CardTitle className="flex items-center gap-2">
               <Code className="h-5 w-5" />
