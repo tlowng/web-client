@@ -140,7 +140,7 @@ export default function ProblemsPage() {
                 {problem._id.slice(0, 8)}
               </TableCell>
               <TableCell>
-                <Link to={`/problems/${problem._id}`} className="text-blue-600 hover:underline font-medium">
+                <Link to={`/problems/${problem._id}`} className="text-primary hover:underline font-medium">
                   {problem.title ?? 'Untitled'}
                 </Link>
               </TableCell>

@@ -57,9 +57,9 @@ function Brand() {
     return (
         <Link to="/">
             {state === 'collapsed' ? (
-                <img src="/icon.webp" alt="AwlOJ Icon" className="w-8 h-8" />
+                <img src="/temp.png" alt="iuhaanhhlamdayhaanhbtk?" className="w-8 h-8" />
             ) : (
-                <span className="text-xl font-bold text-foreground">AwlOJ</span>
+                <span className="text-xl font-bold text-foreground p-2">AwlOJ</span>
             )}
         </Link>
     )
@@ -69,7 +69,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
-        <div className="flex items-center p-4 justify-center">
+        <div className="flex items-center">
             <Brand />
         </div>
       </SidebarHeader>

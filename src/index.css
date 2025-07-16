@@ -1,6 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&display=swap');
 @import "tailwindcss";
 @import "tw-animate-css";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 @custom-variant dark (&:is(.dark *));
 
@@ -10,132 +13,93 @@
   font-weight: 400;
 
   color-scheme: light;
-  color: #303446;
-  background-color: #eff1f5;
+  color: hsl(234 16% 35%);
+  background-color: hsl(220 23% 95%);
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
-  /* Catppuccin Frappé Light */
-  --rosewater: #f2d5cf;
-  --flamingo: #eebebe;
-  --pink: #f4b8e4;
-  --mauve: #ca9ee6;
-  --red: #e78284;
-  --maroon: #ea999c;
-  --peach: #ef9f76;
-  --yellow: #e5c890;
-  --green: #a6d189;
-  --teal: #81c8be;
-  --sky: #99d1db;
-  --sapphire: #85c1dc;
-  --blue: #8caaee;
-  --lavender: #babbf1;
-  --text: #5c5f77;
-  --subtext1: #6c6f85;
-  --subtext0: #7c7f93;
-  --overlay2: #8c8fa1;
-  --overlay1: #9ca0b0;
-  --overlay0: #acb0be;
-  --surface2: #bcc0cc;
-  --surface1: #ccd0da;
-  --surface0: #dddfe8;
-  --base: #eff1f5;
-  --mantle: #e6e9ef;
-  --crust: #dce0e8;
+  /* Catppuccin Latte (Light) colors */
+  --background: 220 23% 95%; /* ctp-latte-base */
+  --foreground: 234 16% 35%; /* ctp-latte-text */
 
-  --radius: 0.625rem;
-  --background: var(--base);
-  --foreground: var(--text);
-  --card: var(--mantle);
-  --card-foreground: var(--text);
-  --popover: var(--crust);
-  --popover-foreground: var(--text);
-  --primary: var(--mauve);
-  --primary-foreground: var(--crust);
-  --secondary: var(--pink);
-  --secondary-foreground: var(--crust);
-  --muted: var(--surface0);
-  --muted-foreground: var(--subtext1);
-  --accent: var(--surface2);
-  --accent-foreground: var(--text);
-  --destructive: var(--red);
-  --border: var(--crust);
-  --input: var(--surface1);
-  --ring: var(--mauve);
-  
+  --card: 230 19% 98%; /* ctp-latte-surface0 */
+  --card-foreground: 234 16% 35%; /* ctp-latte-text */
+
+  --popover: 230 19% 98%; /* ctp-latte-surface0 */
+  --popover-foreground: 234 16% 35%; /* ctp-latte-text */
+
+  --primary: 267 83% 60%; /* ctp-latte-mauve, slightly darker */
+  --primary-foreground: 220 23% 95%; /* ctp-latte-base */
+
+  --secondary: 183 74% 35%; /* ctp-latte-teal, slightly darker */
+  --secondary-foreground: 220 23% 95%; /* ctp-latte-base */
+
+  --muted: 220 23% 90%; /* ctp-latte-surface1 */
+  --muted-foreground: 234 16% 45%; /* ctp-latte-subtext0 */
+
+  --accent: 267 83% 75%; /* ctp-latte-mauve, brighter */
+  --accent-foreground: 234 16% 35%; /* ctp-latte-text */
+
+  --destructive: 0 63% 31%;
+  --destructive-foreground: 0 0% 98%;
+
+  --border: 220 23% 85%; /* ctp-latte-surface2 */
+  --input: 220 23% 85%; /* ctp-latte-surface2 */
+  --ring: 267 83% 60%; /* ctp-latte-mauve */
+
+  --radius: 0.75rem;
+
   /* Sidebar specific variables */
-  --sidebar: var(--mantle);
-  --sidebar-foreground: var(--text);
-  --sidebar-border: var(--crust);
-  --sidebar-accent: var(--surface0);
-  --sidebar-accent-foreground: var(--text);
-  --sidebar-ring: var(--mauve);
+  --sidebar: 230 19% 98%; /* ctp-latte-surface0 */
+  --sidebar-foreground: 234 16% 35%; /* ctp-latte-text */
+  --sidebar-border: 220 23% 85%; /* ctp-latte-surface2 */
+  --sidebar-accent: 220 23% 90%; /* ctp-latte-surface1 */
+  --sidebar-accent-foreground: 234 16% 35%; /* ctp-latte-text */
+  --sidebar-ring: 267 83% 60%; /* ctp-latte-mauve */
 }
 
 .dark {
   color-scheme: dark;
-  color: #c6d0f5;
-  background-color: #303446;
+  color: hsl(240 21% 83%);
+  background-color: hsl(240 21% 15%);
 
-  /* Catppuccin Frappé Dark */
-  --rosewater: #f2d5cf;
-  --flamingo: #eebebe;
-  --pink: #f4b8e4;
-  --mauve: #ca9ee6;
-  --red: #e78284;
-  --maroon: #ea999c;
-  --peach: #ef9f76;
-  --yellow: #e5c890;
-  --green: #a6d189;
-  --teal: #81c8be;
-  --sky: #99d1db;
-  --sapphire: #85c1dc;
-  --blue: #8caaee;
-  --lavender: #babbf1;
-  --text: #c6d0f5;
-  --subtext1: #b5bfe2;
-  --subtext0: #a5adce;
-  --overlay2: #949cbb;
-  --overlay1: #838ba7;
-  --overlay0: #737994;
-  --surface2: #626880;
-  --surface1: #51576d;
-  --surface0: #414559;
-  --base: #303446;
-  --mantle: #292c3c;
-  --crust: #232634;
+  /* Catppuccin Mocha Mauve theme colors */
+  --background: 240 21% 15%; /* ctp-mocha-base */
+  --foreground: 240 21% 83%; /* ctp-mocha-text */
 
-  --background: var(--base);
-  --foreground: var(--text);
-  --card: var(--mantle);
-  --card-foreground: var(--text);
-  --popover: var(--crust);
-  --popover-foreground: var(--text);
-  --primary: var(--mauve);
-  --primary-foreground: var(--crust);
-  --secondary: var(--pink);
-  --secondary-foreground: var(--crust);
-  --muted: var(--surface0);
-  --muted-foreground: var(--subtext1);
-  --accent: var(--surface2);
-  --accent-foreground: var(--text);
-  --destructive: var(--red);
-  --border: var(--crust);
-  --input: var(--surface1);
-  --ring: var(--mauve);
-  
+  --card: 240 21% 19%; /* ctp-mocha-surface0 */
+  --card-foreground: 240 21% 83%; /* ctp-mocha-text */
+
+  --popover: 240 21% 19%; /* ctp-mocha-surface0 */
+  --popover-foreground: 240 21% 83%; /* ctp-mocha-text */
+
+  --primary: 267 84% 81%; /* ctp-mocha-mauve */
+  --primary-foreground: 240 21% 15%; /* ctp-mocha-base */
+
+  --secondary: 183 74% 70%; /* ctp-mocha-teal */
+  --secondary-foreground: 240 21% 15%; /* ctp-mocha-base */
+
+  --muted: 240 21% 22%; /* ctp-mocha-surface1 */
+  --muted-foreground: 240 21% 65%; /* ctp-mocha-subtext0 */
+
+  --accent: 267 84% 81%; /* ctp-mocha-mauve */
+  --accent-foreground: 240 21% 15%; /* ctp-mocha-base */
+
+  --destructive: 0 63% 31%;
+  --destructive-foreground: 0 0% 98%;
+
+  --border: 240 21% 25%; /* ctp-mocha-surface2 */
+  --input: 240 21% 25%; /* ctp-mocha-surface2 */
+  --ring: 267 84% 81%; /* ctp-mocha-mauve */
+
   /* Sidebar specific variables */
-  --sidebar: var(--mantle);
-  --sidebar-foreground: var(--text);
-  --sidebar-border: var(--crust);
-  --sidebar-accent: var(--surface0);
-  --sidebar-accent-foreground: var(--text);
-  --sidebar-ring: var(--mauve);
+  --sidebar: 240 21% 19%; /* ctp-mocha-surface0 */
+  --sidebar-foreground: 240 21% 83%; /* ctp-mocha-text */
+  --sidebar-border: 240 21% 25%; /* ctp-mocha-surface2 */
+  --sidebar-accent: 240 21% 22%; /* ctp-mocha-surface1 */
+  --sidebar-accent-foreground: 240 21% 83%; /* ctp-mocha-text */
+  --sidebar-ring: 267 84% 81%; /* ctp-mocha-mauve */
 }
-
-@tailwind base;
-@tailwind components;
-@tailwind utilities;

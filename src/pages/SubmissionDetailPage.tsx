@@ -142,7 +142,7 @@ export default function SubmissionDetailPage() {
 
           <div>
             <h3 className="text-lg font-semibold mb-2">Submitted Code:</h3>
-            <pre className="bg-gray-800 text-white p-4 rounded-md overflow-x-auto">
+            <pre className="bg-muted text-muted-foreground p-4 rounded-md overflow-x-auto">
               <code>{submission.code}</code>
             </pre>
           </div>
