@@ -6,27 +6,27 @@ import {
   Users,
   GitFork,
 } from "lucide-react"
-import { Link } from 'react-router-dom'; // Import Link
+import { Link } from 'react-router-dom';
 
 import { NavMain } from "@/components/nav-main"
-// import { NavProjects } from "@/components/nav-projects" // Commented out as per new structure
 import { NavUser } from "@/components/nav-user"
-// import { TeamSwitcher } from "@/components/team-switcher" // Commented out as per new structure
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
+  useSidebar,
 } from "@/components/ui/sidebar"
+import { ThemeToggle } from "@/components/theme-toggle";
 
 // Updated data for navigation
+// The active state will be determined dynamically in NavMain
 const navData = {
   navMain: [
     {
       title: "Home (Forum)",
-      url: "/", // Assuming / is the forum/home page
+      url: "/",
       icon: Home,
-      isActive: true, // Set active for default page
     },
     {
       title: "Problem List",
@@ -35,39 +35,49 @@ const navData = {
     },
     {
       title: "My Submissions",
-      url: "/submissions/user-submissions", // This route needs to be created in App.tsx and a page for it
+      url: "/submissions/user-submissions",
       icon: FileText,
     },
     {
       title: "Members",
-      url: "/members", // This route needs to be created in App.tsx and a page for it
+      url: "/members",
       icon: Users,
     },
     {
       title: "Groups",
-      url: "/groups", // This route needs to be created in App.tsx and a page for it
+      url: "/groups",
       icon: GitFork,
     },
   ],
+}
+
+function Brand() {
+    const { state } = useSidebar()
+
+    return (
+        <Link to="/">
+            {state === 'collapsed' ? (
+                <img src="/icon.webp" alt="AwlOJ Icon" className="w-8 h-8" />
+            ) : (
+                <span className="text-xl font-bold text-foreground">AwlOJ</span>
+            )}
+        </Link>
+    )
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
-        {/* Removing TeamSwitcher as per new structure, or customize as needed */}
-        <div className="flex items-center justify-center p-4">
-          <Link to="/" className="text-xl font-bold text-foreground">
-            Online Judge
-          </Link>
+        <div className="flex items-center p-4 justify-center">
+            <Brand />
         </div>
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={navData.navMain} />
-        {/* Removing NavProjects as per new structure */}
       </SidebarContent>
-      <SidebarFooter>
-        {/* NavUser will handle displaying logged in user info or login/register buttons */}
+      <SidebarFooter className="flex items-center justify-center gap-2">
+        <ThemeToggle />
         <NavUser />
       </SidebarFooter>
     </Sidebar>
