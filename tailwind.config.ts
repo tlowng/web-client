@@ -55,10 +55,10 @@ const config = {
         sidebar: {
           DEFAULT: "hsl(var(--sidebar))",
           foreground: "hsl(var(--foreground))",
-          border: "hsl(var(--border))",
+          border: "hsl(var(--sidebar-border))",
           accent: "hsl(var(--accent))",
           "accent-foreground": "hsl(var(--accent-foreground))",
-          ring: "hsl(var(--ring))",
+          ring: "hsl(var(--sidebar-ring))",
         },
         success: {
           DEFAULT: "hsl(var(--success))",
