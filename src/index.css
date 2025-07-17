@@ -1,9 +1,40 @@
 @import url('https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&display=swap');
 @import "tailwindcss";
 @import "tw-animate-css";
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+
+@theme {
+
+  /* Catppuccin Latte (Light) colors */
+    --background: 220 23% 95%; /* ctp-latte-base */
+    --foreground: 234 16% 35%; /* ctp-latte-text */
+
+    --card: 230 19% 98%; /* ctp-latte-surface0 */
+    --card-foreground: 234 16% 35%; /* ctp-latte-text */
+
+    --popover: 230 19% 98%; /* ctp-latte-surface0 */
+    --popover-foreground: 234 16% 35%; /* ctp-latte-text */
+
+    --primary: 267 83% 60%; /* ctp-latte-mauve, slightly darker */
+    --primary-foreground: 220 23% 95%; /* ctp-latte-base */
+
+    --secondary: 183 74% 35%; /* ctp-latte-teal, slightly darker */
+    --secondary-foreground: 220 23% 95%; /* ctp-latte-base */
+
+    --muted: 220 23% 90%; /* ctp-latte-surface1 */
+    --muted-foreground: 234 16% 45%; /* ctp-latte-subtext0 */
+
+    --accent: 267 83% 75%; /* ctp-latte-mauve, brighter */
+    --accent-foreground: 234 16% 35%; /* ctp-latte-text */
+
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 220 23% 85%; /* ctp-latte-surface2 */
+    --input: 220 23% 85%; /* ctp-latte-surface2 */
+    --ring: 267 83% 60%; /* ctp-latte-mauve */
+
+    --radius: 0.75rem;
+}
 
 @custom-variant dark (&:is(.dark *));
 
@@ -11,95 +42,119 @@
   font-family: 'Lexend', system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
-
   color-scheme: light;
-  color: hsl(234 16% 35%);
-  background-color: hsl(220 23% 95%);
-
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-
-  /* Catppuccin Latte (Light) colors */
-  --background: 220 23% 95%; /* ctp-latte-base */
-  --foreground: 234 16% 35%; /* ctp-latte-text */
-
-  --card: 230 19% 98%; /* ctp-latte-surface0 */
-  --card-foreground: 234 16% 35%; /* ctp-latte-text */
-
-  --popover: 230 19% 98%; /* ctp-latte-surface0 */
-  --popover-foreground: 234 16% 35%; /* ctp-latte-text */
-
-  --primary: 267 83% 60%; /* ctp-latte-mauve, slightly darker */
-  --primary-foreground: 220 23% 95%; /* ctp-latte-base */
-
-  --secondary: 183 74% 35%; /* ctp-latte-teal, slightly darker */
-  --secondary-foreground: 220 23% 95%; /* ctp-latte-base */
-
-  --muted: 220 23% 90%; /* ctp-latte-surface1 */
-  --muted-foreground: 234 16% 45%; /* ctp-latte-subtext0 */
-
-  --accent: 267 83% 75%; /* ctp-latte-mauve, brighter */
-  --accent-foreground: 234 16% 35%; /* ctp-latte-text */
-
-  --destructive: 0 63% 31%;
-  --destructive-foreground: 0 0% 98%;
-
-  --border: 220 23% 85%; /* ctp-latte-surface2 */
-  --input: 220 23% 85%; /* ctp-latte-surface2 */
-  --ring: 267 83% 60%; /* ctp-latte-mauve */
-
   --radius: 0.75rem;
-
-  /* Sidebar specific variables */
-  --sidebar: 230 19% 98%; /* ctp-latte-surface0 */
-  --sidebar-foreground: 234 16% 35%; /* ctp-latte-text */
-  --sidebar-border: 220 23% 85%; /* ctp-latte-surface2 */
-  --sidebar-accent: 220 23% 90%; /* ctp-latte-surface1 */
-  --sidebar-accent-foreground: 234 16% 35%; /* ctp-latte-text */
-  --sidebar-ring: 267 83% 60%; /* ctp-latte-mauve */
 }
 
 .dark {
   color-scheme: dark;
-  color: hsl(240 21% 83%);
-  background-color: hsl(240 21% 15%);
+    /* Catppuccin Mocha Mauve theme colors */
+    --background: 240 21% 15%; /* ctp-mocha-base */
+    --foreground: 240 21% 83%; /* ctp-mocha-text */
 
-  /* Catppuccin Mocha Mauve theme colors */
-  --background: 240 21% 15%; /* ctp-mocha-base */
-  --foreground: 240 21% 83%; /* ctp-mocha-text */
+    --card: 240 21% 19%; /* ctp-mocha-surface0 */
+    --card-foreground: 240 21% 83%; /* ctp-mocha-text */
 
-  --card: 240 21% 19%; /* ctp-mocha-surface0 */
-  --card-foreground: 240 21% 83%; /* ctp-mocha-text */
+    --popover: 240 21% 19%; /* ctp-mocha-surface0 */
+    --popover-foreground: 240 21% 83%; /* ctp-mocha-text */
 
-  --popover: 240 21% 19%; /* ctp-mocha-surface0 */
-  --popover-foreground: 240 21% 83%; /* ctp-mocha-text */
+    --primary: 267 84% 81%; /* ctp-mocha-mauve */
+    --primary-foreground: 240 21% 15%; /* ctp-mocha-base */
 
-  --primary: 267 84% 81%; /* ctp-mocha-mauve */
-  --primary-foreground: 240 21% 15%; /* ctp-mocha-base */
+    --secondary: 183 74% 70%; /* ctp-mocha-teal */
+    --secondary-foreground: 240 21% 15%; /* ctp-mocha-base */
 
-  --secondary: 183 74% 70%; /* ctp-mocha-teal */
-  --secondary-foreground: 240 21% 15%; /* ctp-mocha-base */
+    --muted: 240 21% 22%; /* ctp-mocha-surface1 */
+    --muted-foreground: 240 21% 65%; /* ctp-mocha-subtext0 */
 
-  --muted: 240 21% 22%; /* ctp-mocha-surface1 */
-  --muted-foreground: 240 21% 65%; /* ctp-mocha-subtext0 */
+    --accent: 267 84% 81%; /* ctp-mocha-mauve */
+    --accent-foreground: 240 21% 15%; /* ctp-mocha-base */
 
-  --accent: 267 84% 81%; /* ctp-mocha-mauve */
-  --accent-foreground: 240 21% 15%; /* ctp-mocha-base */
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 0 0% 98%;
 
-  --destructive: 0 63% 31%;
-  --destructive-foreground: 0 0% 98%;
+    --border: 240 21% 25%; /* ctp-mocha-surface2 */
+    --input: 240 21% 25%; /* ctp-mocha-surface2 */
+    --ring: 267 84% 81%; /* ctp-mocha-mauve */
+}
 
-  --border: 240 21% 25%; /* ctp-mocha-surface2 */
-  --input: 240 21% 25%; /* ctp-mocha-surface2 */
-  --ring: 267 84% 81%; /* ctp-mocha-mauve */
+/* Force generate utilities */
+@layer utilities {
+  .bg-primary {
+    background-color: hsl(var(--primary));
+  }
+  
+  .text-primary-foreground {
+    color: hsl(var(--primary-foreground));
+  }
 
-  /* Sidebar specific variables */
-  --sidebar: 240 21% 19%; /* ctp-mocha-surface0 */
-  --sidebar-foreground: 240 21% 83%; /* ctp-mocha-text */
-  --sidebar-border: 240 21% 25%; /* ctp-mocha-surface2 */
-  --sidebar-accent: 240 21% 22%; /* ctp-mocha-surface1 */
-  --sidebar-accent-foreground: 240 21% 83%; /* ctp-mocha-text */
-  --sidebar-ring: 267 84% 81%; /* ctp-mocha-mauve */
+  .bg-card {
+    background-color: hsl(var(--card));
+    color: hsl(var(--card-foreground));
+  }
+  
+  .bg-secondary {
+    background-color: hsl(var(--secondary));
+  }
+  
+  .text-secondary-foreground {
+    color: hsl(var(--secondary-foreground));
+  }
+  
+  .bg-background {
+    background-color: hsl(var(--background));
+  }
+  
+  .text-foreground {
+    color: hsl(var(--foreground));
+  }
+}
+
+@layer base {
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+  }
+  
+  .card {
+    background-color: hsl(var(--card));
+    color: hsl(var(--card-foreground));
+  }
+  
+  .popover {
+    background-color: hsl(var(--popover));
+    color: hsl(var(--popover-foreground));
+  }
+  
+  .input {
+    background-color: hsl(var(--input));
+    border-color: hsl(var(--border));
+  }
+  
+  .button {
+    background-color: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background-color: rgba(229, 231, 235, 0.5); /* bg-muted/50 => thường là gray-200/gray-300 */
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: rgba(59, 130, 246, 0.3); /* bg-primary/30 => thường là blue-500 */
+    border-radius: 9999px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(59, 130, 246, 0.5); /* bg-primary/50 */
+  }
 }
