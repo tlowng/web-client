@@ -13,7 +13,7 @@ api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
     if (token) {
-      config.headers['x-auth-token'] = token; 
+      config.headers['x-auth-token'] = token;
     }
     return config;
   },
@@ -22,7 +22,7 @@ api.interceptors.request.use(
   }
 );
 
-// Basic types for API responses 
+// Basic types for API responses
 interface UserData {
   username?: string;
   email: string;
@@ -33,7 +33,7 @@ interface UserData {
 interface ProblemData {
   _id?: string; // Add _id as optional for creation, but present on fetch
   title: string;
-  description: string;
+  description:string;
   difficulty: string;
   timeLimit: number;
   memoryLimit: number;
@@ -91,3 +91,52 @@ export const getUserSubmissions = () => api.get<SubmissionResult[]>('/submission
 
 // User Profile call
 export const getMe = () => api.get<UserProfile>('/auth/me');
+
+// Forum Types
+export interface ForumCategory {
+  _id: string;
+  name: string;
+  description: string;
+  slug: string;
+  icon: string;
+  color: string;
+}
+
+export interface ForumTopic {
+    _id: string;
+    title: string;
+    slug: string;
+    content: string;
+    author: {
+        _id: string;
+        username: string;
+    };
+    category: {
+        _id: string;
+        name: string;
+        slug: string;
+    };
+    createdAt: string;
+    postCount: number;
+    viewCount: number;
+}
+
+export interface ForumPost {
+    _id: string;
+    content: string;
+    author: {
+        _id: string;
+        username: string;
+    };
+    createdAt: string;
+    likeCount: number;
+}
+
+
+// Forum calls
+export const getForumCategories = () => api.get<ForumCategory[]>('/forum/categories');
+export const getCategoryBySlug = (slug: string) => api.get<ForumCategory>(`/forum/categories/${slug}`);
+export const getForumTopics = (params?: { page?: number, limit?: number, sort?: string, category?: string }) => api.get<ForumTopic[]>('/forum/topics', { params });
+export const getTopicBySlug = (slug: string) => api.get<ForumTopic>(`/forum/topics/${slug}`);
+export const getPostsByTopic = (topicId: string) => api.get<ForumPost[]>(`/forum/posts/topic/${topicId}`);
+export const searchForumTopics = (query: string) => api.get<ForumTopic[]>(`/forum/topics/search?q=${query}`);

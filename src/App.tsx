@@ -18,6 +18,8 @@ import SubmissionDetailPage from './pages/SubmissionDetailPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import ForumPage from './pages/ForumPage';
+import ForumCategoryPage from './pages/ForumCategoryPage';
+import ForumTopicPage from './pages/ForumTopicPage';
 import UserSubmissionsPage from './pages/UserSubmissionsPage';
 import MembersPage from './pages/MembersPage';
 import GroupsPage from './pages/GroupsPage';
@@ -42,6 +44,9 @@ export default function App() {
             <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
               <Routes>
                 <Route path="/" element={<ForumPage />} />
+                <Route path="/forum" element={<ForumPage />} />
+                <Route path="/forum/:slug" element={<ForumCategoryPage />} />
+                <Route path="/forum/topic/:slug" element={<ForumTopicPage />} />
                 <Route path="/problems" element={<ProblemsPage />} />
                 <Route path="/problems/:id" element={<ProblemDetailPage />} />
                 <Route path="/submissions/user-submissions" element={<UserSubmissionsPage />} />
@@ -49,7 +54,7 @@ export default function App() {
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/register" element={<RegisterPage />} />
                 <Route path="/members" element={<MembersPage />} />
-                <Route path="/groups" element={<GroupsPage />} />
+                <Route path="/groups" an element={<GroupsPage />} />
               </Routes>
             </div>
           </SidebarInset>
