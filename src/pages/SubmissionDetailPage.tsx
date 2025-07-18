@@ -125,7 +125,7 @@ export default function SubmissionDetailPage() {
             {submission.memoryUsed !== undefined && (
               <div>
                 <p className="font-medium">Memory Used:</p>
-                <p>{submission.memoryUsed} MB</p>
+                <p>{submission.memoryUsed} KB</p>
               </div>
             )}
             <div>
