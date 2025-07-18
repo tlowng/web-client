@@ -125,7 +125,7 @@ export default function UserSubmissionsPage() {
               <Code className="h-5 w-5" />
               My Submissions
             </CardTitle>
-            <Badge variant="secondary" className="text-sm">
+            <Badge variant="secondary" className="text-sm bg-primary">
               {submissions.length} Total
             </Badge>
           </div>

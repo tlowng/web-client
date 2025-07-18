@@ -146,7 +146,7 @@ export default function ForumPage() {
           {searchResults !== null ? `Search Results for "${searchTerm}"` : 'Recent Topics'}
         </h2>
         <Card>
-          <CardContent className="pt-3">
+          <CardContent className="pt-1">
             {displayLoading ? (
               <div className="p-6">
                 <div className="space-y-3">
