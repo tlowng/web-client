@@ -9,6 +9,7 @@ import {
 import { Toaster } from "@/components/ui/sonner";
 import { DynamicBreadcrumb } from "@/components/dynamic-breadcrumb";
 import { BreadcrumbProvider } from "@/contexts/breadcrumb-context";
+import { ErrorBoundary } from "@/components/error-boundary";
 
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
@@ -26,40 +27,44 @@ import GroupsPage from './pages/GroupsPage';
 
 export default function App() {
   return (
-    <BrowserRouter>
-      <BreadcrumbProvider>
-        <SidebarProvider>
-          <AppSidebar />
-          <SidebarInset>
-            <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
-              <div className="flex items-center gap-2 px-4">
-                <SidebarTrigger className="-ml-1" />
-                <Separator
-                  orientation="vertical"
-                  className="mr-2 data-[orientation=vertical]:h-4"
-                />
-                <DynamicBreadcrumb />
+    <ErrorBoundary>
+      <BrowserRouter>
+        <BreadcrumbProvider>
+          <SidebarProvider>
+            <AppSidebar />
+            <SidebarInset>
+              <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
+                <div className="flex items-center gap-2 px-4">
+                  <SidebarTrigger className="-ml-1" />
+                  <Separator
+                    orientation="vertical"
+                    className="mr-2 data-[orientation=vertical]:h-4"
+                  />
+                  <DynamicBreadcrumb />
+                </div>
+              </header>
+              <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
+                <ErrorBoundary>
+                  <Routes>
+                    <Route path="/" element={<ForumPage />} />
+                    <Route path="/forum/:slug" element={<ForumCategoryPage />} />
+                    <Route path="/forum/topic/:slug" element={<ForumTopicPage />} />
+                    <Route path="/problems" element={<ProblemsPage />} />
+                    <Route path="/problems/:id" element={<ProblemDetailPage />} />
+                    <Route path="/submissions/user-submissions" element={<UserSubmissionsPage />} />
+                    <Route path="/submissions/:id" element={<SubmissionDetailPage />} />
+                    <Route path="/login" element={<LoginPage />} />
+                    <Route path="/register" element={<RegisterPage />} />
+                    <Route path="/members" element={<MembersPage />} />
+                    <Route path="/groups" element={<GroupsPage />} />
+                  </Routes>
+                </ErrorBoundary>
               </div>
-            </header>
-            <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-              <Routes>
-                <Route path="/" element={<ForumPage />} />
-                <Route path="/forum/:slug" element={<ForumCategoryPage />} />
-                <Route path="/forum/topic/:slug" element={<ForumTopicPage />} />
-                <Route path="/problems" element={<ProblemsPage />} />
-                <Route path="/problems/:id" element={<ProblemDetailPage />} />
-                <Route path="/submissions/user-submissions" element={<UserSubmissionsPage />} />
-                <Route path="/submissions/:id" element={<SubmissionDetailPage />} />
-                <Route path="/login" element={<LoginPage />} />
-                <Route path="/register" element={<RegisterPage />} />
-                <Route path="/members" element={<MembersPage />} />
-                <Route path="/groups" element={<GroupsPage />} />
-              </Routes>
-            </div>
-          </SidebarInset>
-        </SidebarProvider>
-      </BreadcrumbProvider>
-      <Toaster />
-    </BrowserRouter>
+            </SidebarInset>
+          </SidebarProvider>
+        </BreadcrumbProvider>
+        <Toaster />
+      </BrowserRouter>
+    </ErrorBoundary>
   );
 }
