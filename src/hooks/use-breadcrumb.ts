@@ -62,7 +62,10 @@ export function useBreadcrumb(): BreadcrumbItem[] {
         // If no exact match, try with parameter pattern
         if (!config) {
           // Replace potential IDs with parameter patterns
-          const parameterizedPath = currentPath.replace(/\/[a-f0-9]{24}$/, '/:id').replace(/\/[a-f0-9]{8,}$/, '/:id');
+          const parameterizedPath = currentPath
+            .replace(/\/[a-f0-9]{24}$/, '/:id')
+            .replace(/\/[a-f0-9]{8,}$/, '/:id')
+            .replace(/\/[a-z0-9-]+$/, '/:slug'); // Add slug pattern
           config = routeConfig[parameterizedPath];
           routeKey = parameterizedPath;
         }
@@ -94,7 +97,10 @@ export function useBreadcrumb(): BreadcrumbItem[] {
 
 // Helper function to get route title for dynamic content
 export function getRouteTitle(pathname: string, dynamicTitle?: string): string {
-  const parameterizedPath = pathname.replace(/\/[a-f0-9]{24}$/, '/:id').replace(/\/[a-f0-9]{8,}$/, '/:id');
+  const parameterizedPath = pathname
+    .replace(/\/[a-f0-9]{24}$/, '/:id')
+    .replace(/\/[a-f0-9]{8,}$/, '/:id')
+    .replace(/\/[a-z0-9-]+$/, '/:slug');
   const config = routeConfig[parameterizedPath];
   
   if (dynamicTitle) {

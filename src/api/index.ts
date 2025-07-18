@@ -261,3 +261,167 @@ export const searchForumTopics = async (query: string, params?: {
     throw error;
   }
 };
+
+// Create new forum topic
+export const createForumTopic = async (data: {
+  title: string;
+  content: string;
+  categoryId: string;
+  tags?: string[];
+}) => {
+  try {
+    const response = await api.post<ApiResponse<ForumTopic>>('/forum/topics', data);
+    return response.data;
+  } catch (error) {
+    console.error("Failed to create forum topic:", error);
+    throw error;
+  }
+};
+
+// Create new forum post
+export const createForumPost = async (data: {
+  content: string;
+  topicId: string;
+  replyToPostId?: string;
+}) => {
+  try {
+    const response = await api.post<ApiResponse<ForumPost>>('/forum/posts', data);
+    return response.data;
+  } catch (error) {
+    console.error("Failed to create forum post:", error);
+    throw error;
+  }
+};
+
+// Like/unlike post
+export const likeForumPost = async (postId: string, type: string = 'like') => {
+  try {
+    const response = await api.post<ApiResponse<{
+      message: string;
+      liked: boolean;
+      likeType: string | null;
+    }>>(`/forum/posts/${postId}/like`, { type });
+    return response.data;
+  } catch (error) {
+    console.error("Failed to like forum post:", error);
+    throw error;
+  }
+};
+
+// Delete post
+export const deleteForumPost = async (postId: string) => {
+  try {
+    const response = await api.delete<ApiResponse<{ message: string }>>(`/forum/posts/${postId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Failed to delete forum post:", error);
+    throw error;
+  }
+};
+
+// Forum profile interfaces
+export interface ForumProfile {
+  signature?: string;
+  title?: string;
+  location?: string;
+  website?: string;
+  githubProfile?: string;
+  postCount: number;
+  topicCount: number;
+  reputation: number;
+  preferences?: {
+    emailNotifications: boolean;
+    showOnlineStatus: boolean;
+  };
+  lastSeen?: string;
+}
+
+export interface UserWithProfile {
+  user: UserProfile;
+  profile: ForumProfile;
+  recentActivity?: {
+    topics: ForumTopic[];
+    posts: ForumPost[];
+  };
+}
+
+// Get forum profile
+export const getForumProfile = async (userId: string) => {
+  try {
+    const response = await api.get<ApiResponse<UserWithProfile>>(`/forum/profiles/${userId}`);
+    return response.data.data;
+  } catch (error) {
+    console.error("Failed to get forum profile:", error);
+    throw error;
+  }
+};
+
+// Update my forum profile
+export const updateMyForumProfile = async (data: Partial<ForumProfile>) => {
+  try {
+    const response = await api.put<ApiResponse<ForumProfile>>('/forum/profiles/me', data);
+    return response.data.data;
+  } catch (error) {
+    console.error("Failed to update forum profile:", error);
+    throw error;
+  }
+};
+
+// Get forum leaderboard
+export const getForumLeaderboard = async (params?: {
+  type?: 'reputation' | 'posts' | 'topics';
+  page?: number;
+  limit?: number;
+}) => {
+  try {
+    const response = await api.get<ApiResponse<{
+      profiles: Array<{
+        _id: string;
+        user: UserProfile;
+        signature?: string;
+        title?: string;
+        location?: string;
+        postCount: number;
+        topicCount: number;
+        reputation: number;
+        lastSeen: string;
+      }>;
+      pagination: {
+        page: number;
+        limit: number;
+        total: number;
+        pages: number;
+      };
+    }>>('/forum/profiles/leaderboard', { params });
+    return response.data.data;
+  } catch (error) {
+    console.error("Failed to get forum leaderboard:", error);
+    throw error;
+  }
+};
+
+// Get forum stats
+export const getForumStats = async () => {
+  try {
+    const response = await api.get<ApiResponse<{
+      overview: {
+        categories: number;
+        topics: number;
+        posts: number;
+        users: number;
+        activeUsers: number;
+      };
+      trendingTopics: ForumTopic[];
+      topContributors: Array<{
+        user: { username: string };
+        reputation: number;
+        postCount: number;
+        topicCount: number;
+      }>;
+    }>>('/forum/stats');
+    return response.data.data;
+  } catch (error) {
+    console.error("Failed to get forum stats:", error);
+    throw error;
+  }
+};  

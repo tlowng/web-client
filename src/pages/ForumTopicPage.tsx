@@ -1,18 +1,42 @@
 // src/pages/ForumTopicPage.tsx
-import { useParams } from 'react-router-dom';
+import React from 'react';
+import { useParams, Link } from 'react-router-dom';
 import { useFetch } from '@/hooks/use-fetch';
-import { getTopicBySlug, getPostsByTopic } from '@/api';
+import { getTopicBySlug, getPostsByTopic, createForumPost, likeForumPost, deleteForumPost } from '@/api';
 import type { ForumTopic, ForumPost } from '@/api';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { ThumbsUp, Eye, MessageSquare } from 'lucide-react';
+import { ThumbsUp, Eye, MessageSquare, Trash2 } from 'lucide-react';
 import { useBreadcrumbTitle } from '@/contexts/breadcrumb-context';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
+import { toast } from 'sonner';
+import { getMe } from '@/api';
+import type { UserProfile } from '@/api';
 
 export default function ForumTopicPage() {
   const { slug } = useParams<{ slug: string }>();
+  const [replyContent, setReplyContent] = useState('');
+  const [replyingTo, setReplyingTo] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [currentUser, setCurrentUser] = useState<UserProfile | null>(null);
+
+  // Fetch current user
+  React.useEffect(() => {
+    const fetchUser = async () => {
+      const token = localStorage.getItem('token');
+      if (token) {
+        try {
+          const user = await getMe();
+          setCurrentUser(user);
+        } catch (error) {
+          console.error('Failed to fetch user:', error);
+        }
+      }
+    };
+    fetchUser();
+  }, []);
 
   // Fixed: Use stable function references to prevent infinite re-renders
   const fetchTopic = useCallback(async () => {
@@ -32,7 +56,7 @@ export default function ForumTopicPage() {
     return await getPostsByTopic(topic._id);
   }, [topic?._id]);
 
-  const { data: posts, loading: postsLoading, error: postsError } = useFetch<ForumPost[]>(
+  const { data: posts, loading: postsLoading, error: postsError, refetch: refetchPosts } = useFetch<ForumPost[]>(
     fetchPostsWithTopic,
     [],
     [topic?._id] // Only refetch when topic._id changes
@@ -40,6 +64,65 @@ export default function ForumTopicPage() {
 
   // Set breadcrumb title when topic is loaded
   useBreadcrumbTitle(topic?.title || 'Topic');
+
+  const handleSubmitReply = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!topic?._id || !replyContent.trim()) return;
+
+    setSubmitting(true);
+    try {
+      await createForumPost({
+        content: replyContent,
+        topicId: topic._id,
+        replyToPostId: replyingTo || undefined,
+      });
+      
+      toast.success('Reply posted successfully!');
+      setReplyContent('');
+      setReplyingTo(null);
+      
+      // Refetch posts
+      await refetchPosts();
+    } catch (error: any) {
+      const message = error.response?.data?.message || 'Failed to post reply';
+      toast.error(message);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleLikePost = async (postId: string) => {
+    if (!currentUser) {
+      toast.error('Please login to like posts');
+      return;
+    }
+
+    try {
+      const response = await likeForumPost(postId);
+      toast.success(response.data.liked ? 'Post liked!' : 'Like removed');
+      
+      // Refetch posts to update like counts
+      await refetchPosts();
+    } catch (error: any) {
+      const message = error.response?.data?.message || 'Failed to like post';
+      toast.error(message);
+    }
+  };
+
+  const handleDeletePost = async (postId: string) => {
+    if (!window.confirm('Are you sure you want to delete this post?')) return;
+
+    try {
+      await deleteForumPost(postId);
+      toast.success('Post deleted successfully');
+      
+      // Refetch posts
+      await refetchPosts();
+    } catch (error: any) {
+      const message = error.response?.data?.message || 'Failed to delete post';
+      toast.error(message);
+    }
+  };
 
   if (topicError) {
     return (
@@ -220,17 +303,36 @@ export default function ForumTopicPage() {
                 />
               </CardContent>
               <CardFooter className="flex justify-between items-center">
-                <Button variant="outline" size="sm" className="flex items-center gap-1">
+                <Button 
+                  variant={post.userLiked ? "default" : "outline"} 
+                  size="sm" 
+                  className="flex items-center gap-1"
+                  onClick={() => handleLikePost(post._id)}
+                >
                   <ThumbsUp size={16} />
                   <span>{post.likeCount || 0}</span>
                 </Button>
                 <div className="flex gap-2">
-                  <Button variant="ghost" size="sm">
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    onClick={() => {
+                      setReplyingTo(post._id);
+                      // Scroll to reply form
+                      document.getElementById('reply-form')?.scrollIntoView({ behavior: 'smooth' });
+                    }}
+                  >
                     Reply
                   </Button>
-                  <Button variant="ghost" size="sm">
-                    Quote
-                  </Button>
+                  {currentUser && (currentUser._id === post.author._id || currentUser.role === 'admin') && (
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={() => handleDeletePost(post._id)}
+                    >
+                      <Trash2 size={16} />
+                    </Button>
+                  )}
                 </div>
               </CardFooter>
             </Card>
@@ -239,28 +341,57 @@ export default function ForumTopicPage() {
       )}
 
       {/* Reply Form */}
-      {topic && !topic.isLocked && (
-        <Card>
+      {topic && !topic.isLocked && currentUser && (
+        <Card id="reply-form">
           <CardHeader>
-            <CardTitle>Your Reply</CardTitle>
+            <CardTitle>
+              {replyingTo ? 'Reply to Post' : 'Your Reply'}
+            </CardTitle>
+            {replyingTo && (
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={() => setReplyingTo(null)}
+              >
+                Cancel reply
+              </Button>
+            )}
           </CardHeader>
-          <CardContent>
-            <Textarea 
-              placeholder="Write your reply here..." 
-              className="min-h-[120px]"
-            />
+          <form onSubmit={handleSubmitReply}>
+            <CardContent>
+              <Textarea 
+                placeholder="Write your reply here..." 
+                className="min-h-[120px]"
+                value={replyContent}
+                onChange={(e) => setReplyContent(e.target.value)}
+                required
+              />
+            </CardContent>
+            <CardFooter className="flex justify-between">
+              <div className="flex gap-2">
+                <Button type="button" variant="outline" size="sm" disabled>
+                  Preview
+                </Button>
+                <Button type="button" variant="outline" size="sm" disabled>
+                  Attach
+                </Button>
+              </div>
+              <Button type="submit" disabled={submitting || !currentUser}>
+                {submitting ? 'Posting...' : 'Post Reply'}
+              </Button>
+            </CardFooter>
+          </form>
+        </Card>
+      )}
+
+      {topic && !topic.isLocked && !currentUser && (
+        <Card>
+          <CardContent className="p-6 text-center">
+            <p className="text-muted-foreground">Please login to reply to this topic.</p>
+            <Button asChild className="mt-4">
+              <Link to="/login">Login</Link>
+            </Button>
           </CardContent>
-          <CardFooter className="flex justify-between">
-            <div className="flex gap-2">
-              <Button variant="outline" size="sm">
-                Preview
-              </Button>
-              <Button variant="outline" size="sm">
-                Attach
-              </Button>
-            </div>
-            <Button>Post Reply</Button>
-          </CardFooter>
         </Card>
       )}
 

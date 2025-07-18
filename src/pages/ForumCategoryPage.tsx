@@ -1,13 +1,14 @@
 // src/pages/ForumCategoryPage.tsx
 import { useParams, Link } from 'react-router-dom';
 import { useFetch } from '@/hooks/use-fetch';
-import { getForumTopics, getCategoryBySlug } from '@/api';
+import { getForumTopics, getCategoryBySlug, getForumCategories } from '@/api';
 import type { ForumTopic, ForumCategory } from '@/api';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { useBreadcrumbTitle } from '@/contexts/breadcrumb-context';
 import { useCallback } from 'react';
+import { CreateTopicDialog } from '@/components/create-topic-dialog';
 
 export default function ForumCategoryPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -23,6 +24,10 @@ export default function ForumCategoryPage() {
     return await getForumTopics({ category: slug });
   }, [slug]);
 
+  const fetchCategories = useCallback(async () => {
+    return await getForumCategories();
+  }, []);
+
   const { data: category, loading: categoryLoading, error: categoryError } = useFetch<ForumCategory>(
     fetchCategory,
     null,
@@ -33,6 +38,11 @@ export default function ForumCategoryPage() {
     fetchTopics,
     [],
     [slug]
+  );
+
+  const { data: allCategories } = useFetch<ForumCategory[]>(
+    fetchCategories,
+    []
   );
 
   // Set breadcrumb title when category is loaded
@@ -90,7 +100,9 @@ export default function ForumCategoryPage() {
       )}
 
       <div className="flex justify-end">
-        <Button>New Topic</Button>
+        <CreateTopicDialog categories={allCategories || []} defaultCategoryId={category?._id}>
+          <Button>New Topic</Button>
+        </CreateTopicDialog>
       </div>
 
       <Card>
@@ -115,7 +127,9 @@ export default function ForumCategoryPage() {
           ) : !topics || topics.length === 0 ? (
             <div className="text-center py-8">
               <p className="text-muted-foreground">No topics found in this category.</p>
-              <Button className="mt-4">Create First Topic</Button>
+              <CreateTopicDialog categories={allCategories || []} defaultCategoryId={category?._id}>
+                <Button className="mt-4">Create First Topic</Button>
+              </CreateTopicDialog>
             </div>
           ) : (
             <Table>

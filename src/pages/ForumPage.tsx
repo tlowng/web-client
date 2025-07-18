@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
+import { CreateTopicDialog } from '@/components/create-topic-dialog';
 
 export default function ForumPage() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -63,7 +64,9 @@ export default function ForumPage() {
     <div className="p-4 space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">Forum</h1>
-        <Button>New Topic</Button>
+        <CreateTopicDialog categories={categories || []}>
+          <Button>New Topic</Button>
+        </CreateTopicDialog>
       </div>
 
       <form onSubmit={handleSearch} className="flex gap-2">
