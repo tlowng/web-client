@@ -12,6 +12,8 @@ export interface BreadcrumbItem {
 // Route configuration for breadcrumb mapping
 const routeConfig: Record<string, { title: string; parent?: string }> = {
   '/': { title: 'Forum' },
+  '/forum/:slug': { title: 'Category', parent: '/' },
+  '/forum/topic/:slug': { title: 'Topic', parent: '/' },
   '/problems': { title: 'Problems', parent: '/' },
   '/problems/:id': { title: 'Problem Detail', parent: '/problems' },
   '/submissions/user-submissions': { title: 'My Submissions', parent: '/' },
