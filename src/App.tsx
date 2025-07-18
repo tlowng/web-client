@@ -44,7 +44,6 @@ export default function App() {
             <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
               <Routes>
                 <Route path="/" element={<ForumPage />} />
-                <Route path="/forum" element={<ForumPage />} />
                 <Route path="/forum/:slug" element={<ForumCategoryPage />} />
                 <Route path="/forum/topic/:slug" element={<ForumTopicPage />} />
                 <Route path="/problems" element={<ProblemsPage />} />
@@ -54,7 +53,7 @@ export default function App() {
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/register" element={<RegisterPage />} />
                 <Route path="/members" element={<MembersPage />} />
-                <Route path="/groups" an element={<GroupsPage />} />
+                <Route path="/groups" element={<GroupsPage />} />
               </Routes>
             </div>
           </SidebarInset>

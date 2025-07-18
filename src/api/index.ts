@@ -132,11 +132,35 @@ export interface ForumPost {
     likeCount: number;
 }
 
+export interface ForumTopicsResponse {
+  topics: ForumTopic[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    pages: number;
+  };
+}
 
-// Forum calls
-export const getForumCategories = () => api.get<ForumCategory[]>('/forum/categories');
+
+
+export const getForumCategories = async () => {
+  const res = await api.get("/forum/categories");
+  console.log(">>> categories API res:", res);
+  return res.data?.data ?? [];
+};
+
 export const getCategoryBySlug = (slug: string) => api.get<ForumCategory>(`/forum/categories/${slug}`);
-export const getForumTopics = (params?: { page?: number, limit?: number, sort?: string, category?: string }) => api.get<ForumTopic[]>('/forum/topics', { params });
+export const getForumTopics = (params?: {
+  page?: number;
+  limit?: number;
+  sort?: string;
+  category?: string;
+}) =>
+  api.get<{ success: boolean; data: ForumTopicsResponse }>("/forum/topics", {
+    params,
+  });
+
 export const getTopicBySlug = (slug: string) => api.get<ForumTopic>(`/forum/topics/${slug}`);
 export const getPostsByTopic = (topicId: string) => api.get<ForumPost[]>(`/forum/posts/topic/${topicId}`);
 export const searchForumTopics = (query: string) => api.get<ForumTopic[]>(`/forum/topics/search?q=${query}`);

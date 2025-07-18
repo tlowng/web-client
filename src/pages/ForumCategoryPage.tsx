@@ -1,7 +1,8 @@
 // src/pages/ForumCategoryPage.tsx
 import { useParams, Link } from 'react-router-dom';
 import { useFetch } from '@/hooks/use-fetch';
-import { getForumTopics, getCategoryBySlug, ForumTopic, ForumCategory } from '@/api';
+import { getForumTopics, getCategoryBySlug } from '@/api';
+import type {ForumTopic, ForumCategory} from '@/api'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';

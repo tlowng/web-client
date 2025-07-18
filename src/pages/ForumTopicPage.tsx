@@ -1,7 +1,8 @@
 // src/pages/ForumTopicPage.tsx
 import { useParams } from 'react-router-dom';
 import { useFetch } from '@/hooks/use-fetch';
-import { getTopicBySlug, getPostsByTopic, ForumTopic, ForumPost } from '@/api';
+import { getTopicBySlug, getPostsByTopic } from '@/api';
+import type { ForumTopic, ForumPost } from '@/api';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';

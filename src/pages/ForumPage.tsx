@@ -1,14 +1,17 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useFetch } from '@/hooks/use-fetch';
-import { getForumCategories, getForumTopics, searchForumTopics, ForumCategory, ForumTopic } from '@/api';
+import { getForumCategories, getForumTopics, searchForumTopics } from '@/api';
+import type { ForumCategory, ForumTopic } from '@/api';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
 export default function ForumPage() {
-  const { data: categories, loading: categoriesLoading } = useFetch(getForumCategories);
+const { data: categories, loading: categoriesLoading } = useFetch(() => getForumCategories());
+  console.log("categories", categories); // Thêm dòng này
+
   const [topics, setTopics] = useState<ForumTopic[] | null>(null);
   const [topicsLoading, setTopicsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
