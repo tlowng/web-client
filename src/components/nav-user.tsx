@@ -60,7 +60,7 @@ export function NavUser() {
       if (token) {
         try {
           const response = await getMe();
-          setCurrentUser(response.data);
+          setCurrentUser(response);
         } catch (error: any) {
           console.error("Failed to fetch user data:", error);
           if (error.response && (error.response.status === 401 || error.response.status === 403)) {

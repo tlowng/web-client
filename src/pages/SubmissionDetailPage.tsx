@@ -34,9 +34,9 @@ export default function SubmissionDetailPage() {
     const fetchSubmission = async () => {
       try {
         const response = await getSubmissionById(id);
-        setSubmission(response.data);
+        setSubmission(response);
 
-        if (!['In Queue', 'Judging', 'Pending'].includes(response.data.status)) {
+        if (!['In Queue', 'Judging', 'Pending'].includes(response.status)) {
           clearInterval(intervalId);
         }
       } catch (err) {

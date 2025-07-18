@@ -15,14 +15,12 @@ export default function ForumCategoryPage() {
   // Fixed: Use stable function references to prevent infinite re-renders
   const fetchCategory = useCallback(async () => {
     if (!slug) throw new Error('Category slug is required');
-    const response = await getCategoryBySlug(slug);
-    return response;
+    return await getCategoryBySlug(slug);
   }, [slug]);
 
   const fetchTopics = useCallback(async () => {
     if (!slug) throw new Error('Category slug is required');
-    const response = await getForumTopics({ category: slug });
-    return response;
+    return await getForumTopics({ category: slug });
   }, [slug]);
 
   const { data: category, loading: categoryLoading, error: categoryError } = useFetch<ForumCategory>(

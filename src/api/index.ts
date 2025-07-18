@@ -76,21 +76,21 @@ export interface UserProfile {
 }
 
 // Auth calls
-export const registerUser = (userData: UserData) => api.post('/auth/signup', userData);
-export const loginUser = (credentials: UserData) => api.post('/auth/login', credentials);
+export const registerUser = (userData: UserData) => api.post('/auth/signup', userData).then(res => res.data);
+export const loginUser = (credentials: UserData) => api.post('/auth/login', credentials).then(res => res.data);
 
 // Problem calls
-export const getProblems = () => api.get<ProblemData[]>('/problems');
-export const getProblemById = (id: string) => api.get<ProblemData>(`/problems/${id}`);
-export const createProblem = (problemData: ProblemData) => api.post('/problems', problemData);
+export const getProblems = () => api.get<ProblemData[]>('/problems').then(res => res.data);
+export const getProblemById = (id: string) => api.get<ProblemData>(`/problems/${id}`).then(res => res.data);
+export const createProblem = (problemData: ProblemData) => api.post('/problems', problemData).then(res => res.data);
 
 // Submission calls
-export const submitCode = (submissionData: SubmissionData) => api.post<{ submissionId: string }>('/submissions', submissionData);
-export const getSubmissionById = (id: string) => api.get<SubmissionResult>(`/submissions/${id}`);
-export const getUserSubmissions = () => api.get<SubmissionResult[]>('/submissions/user-submissions');
+export const submitCode = (submissionData: SubmissionData) => api.post<{ submissionId: string }>('/submissions', submissionData).then(res => res.data);
+export const getSubmissionById = (id: string) => api.get<SubmissionResult>(`/submissions/${id}`).then(res => res.data);
+export const getUserSubmissions = () => api.get<SubmissionResult[]>('/submissions/user-submissions').then(res => res.data);
 
 // User Profile call
-export const getMe = () => api.get<UserProfile>('/auth/me');
+export const getMe = () => api.get<UserProfile>('/auth/me').then(res => res.data);
 
 // Forum Types
 export interface ForumCategory {
@@ -176,7 +176,7 @@ export const getForumCategories = async () => {
     const response = await api.get<ApiResponse<ForumCategory[]>>("/forum/categories");
     console.log(">>> Full categories API response:", response);
     // API returns { success: true, data: [...] }
-    return { data: response.data.data };
+    return response.data.data;
   } catch (error) {
     console.error("Failed to fetch forum categories:", error);
     throw error;
@@ -187,7 +187,7 @@ export const getCategoryBySlug = async (slug: string) => {
   try {
     const response = await api.get<ApiResponse<ForumCategory>>(`/forum/categories/${slug}`);
     // API returns { success: true, data: {...} }
-    return { data: response.data.data };
+    return response.data.data;
   } catch (error) {
     console.error(`Failed to fetch category ${slug}:`, error);
     throw error;
@@ -206,7 +206,7 @@ export const getForumTopics = async (params?: {
     });
     console.log(">>> Full topics API response:", response);
     // API returns { success: true, data: { topics: [...], pagination: {...} } }
-    return { data: response.data.data.topics };
+    return response.data.data.topics;
   } catch (error) {
     console.error("Failed to fetch forum topics:", error);
     throw error;
@@ -217,7 +217,7 @@ export const getTopicBySlug = async (slug: string) => {
   try {
     const response = await api.get<ApiResponse<ForumTopic>>(`/forum/topics/${slug}`);
     // API returns { success: true, data: {...} }
-    return { data: response.data.data };
+    return response.data.data;
   } catch (error) {
     console.error(`Failed to fetch topic ${slug}:`, error);
     throw error;
@@ -233,7 +233,7 @@ export const getPostsByTopic = async (topicId: string, params?: {
       params,
     });
     // API returns { success: true, data: { posts: [...], pagination: {...} } }
-    return { data: response.data.data.posts };
+    return response.data.data.posts;
   } catch (error) {
     console.error(`Failed to fetch posts for topic ${topicId}:`, error);
     throw error;
@@ -255,7 +255,7 @@ export const searchForumTopics = async (query: string, params?: {
       params: searchParams,
     });
     // API returns { success: true, data: { topics: [...], pagination: {...} } }
-    return { data: response.data.data.topics };
+    return response.data.data.topics;
   } catch (error) {
     console.error("Failed to search forum topics:", error);
     throw error;

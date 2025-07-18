@@ -48,9 +48,9 @@ export default function ProblemDetailPage() {
       };
       const response = await submitCode(submissionData);
       toast.success('Submission Successful', {
-        description: `Your submission ${response.data.submissionId} has been queued.`,
+        description: `Your submission ${response.submissionId} has been queued.`,
       });
-      navigate(`/submissions/${response.data.submissionId}`);
+      navigate(`/submissions/${response.submissionId}`);
     } catch (err) {
       toast.error('Submission Failed', {
         description: 'There was an error submitting your code.',

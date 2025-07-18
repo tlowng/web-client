@@ -53,7 +53,7 @@ export function useFetch<T>(
         }
         
         // Process response data
-        const responseData = response.data || response;
+        const responseData = response;
         console.log("useFetch: Processed data:", responseData);
         
         // Set data immediately

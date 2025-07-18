@@ -17,14 +17,8 @@ export default function ForumTopicPage() {
   // Fixed: Use stable function references to prevent infinite re-renders
   const fetchTopic = useCallback(async () => {
     if (!slug) throw new Error('Topic slug is required');
-    const response = await getTopicBySlug(slug);
-    return response;
+    return await getTopicBySlug(slug);
   }, [slug]);
-
-  const fetchPosts = useCallback(async () => {
-    // This will be called after topic is loaded, handled by dependencies
-    return { data: [] };
-  }, []);
 
   const { data: topic, loading: topicLoading, error: topicError } = useFetch<ForumTopic>(
     fetchTopic,
@@ -34,9 +28,8 @@ export default function ForumTopicPage() {
 
   // Create a separate fetcher for posts that depends on topic._id
   const fetchPostsWithTopic = useCallback(async () => {
-    if (!topic?._id) return { data: [] };
-    const response = await getPostsByTopic(topic._id);
-    return response;
+    if (!topic?._id) return [];
+    return await getPostsByTopic(topic._id);
   }, [topic?._id]);
 
   const { data: posts, loading: postsLoading, error: postsError } = useFetch<ForumPost[]>(
