@@ -10,10 +10,11 @@ const api = axios.create({
   },
 });
 
+// Request interceptor to add auth token
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
-    if (token) {
+    if (token && config.headers) {
       config.headers['x-auth-token'] = token;
     }
     return config;
@@ -270,10 +271,20 @@ export const createForumTopic = async (data: {
   tags?: string[];
 }) => {
   try {
+    // Debug: Check token
+    const token = localStorage.getItem('token');
+    console.log('Token exists:', !!token);
+    console.log('Request data:', data);
+    
     const response = await api.post<ApiResponse<ForumTopic>>('/forum/topics', data);
     return response.data;
   } catch (error) {
     console.error("Failed to create forum topic:", error);
+    // Log more details about the error
+    if (axios.isAxiosError(error)) {
+      console.error("Error response:", error.response?.data);
+      console.error("Error status:", error.response?.status);
+    }
     throw error;
   }
 };
@@ -424,4 +435,4 @@ export const getForumStats = async () => {
     console.error("Failed to get forum stats:", error);
     throw error;
   }
-};  
+};
