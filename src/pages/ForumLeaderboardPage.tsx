@@ -90,7 +90,7 @@ export default function ForumLeaderboardPage() {
       case 2:
         return 'outline'; // Bronze
       default:
-        return 'ghost';
+        return 'outline';
     }
   };
 

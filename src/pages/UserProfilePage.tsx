@@ -13,7 +13,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Separator } from '@/components/ui/separator';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+/*import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';*/
 import { 
   User, 
   MapPin, 
@@ -34,7 +34,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useBreadcrumbTitle } from '@/contexts/breadcrumb-context';
-import type { UserProfile, ForumProfile, UserWithProfile, ForumTopic, ForumPost } from '@/api';
+import type { UserProfile, ForumProfile, UserWithProfile } from '@/api';
 
 export default function UserProfilePage() {
   const { userId } = useParams<{ userId: string }>();

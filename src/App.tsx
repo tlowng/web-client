@@ -12,6 +12,7 @@ import { BreadcrumbProvider } from "@/contexts/breadcrumb-context";
 import { ErrorBoundary } from "@/components/error-boundary";
 
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { AdminPanel } from '@/components/admin/admin-panel';
 
 import ProblemsPage from './pages/ProblemsPage';
 import ProblemDetailPage from './pages/ProblemDetailPage';
@@ -27,6 +28,7 @@ import GroupsPage from './pages/GroupsPage';
 import ForumLeaderboardPage from './pages/ForumLeaderboardPage';
 import ForumStatsPage from './pages/ForumStatsPage';
 import UserProfilePage from './pages/UserProfilePage';
+
 
 export default function App() {
   return (
@@ -64,6 +66,7 @@ export default function App() {
                     <Route path="/forum/leaderboard" element={<ForumLeaderboardPage />} />
                     <Route path="/forum/stats" element={<ForumStatsPage />} />
                     <Route path="/forum/profile/:userId" element={<UserProfilePage />} />
+                    <Route path="/admin" element={<AdminPanel />} />
                   </Routes>
                 </ErrorBoundary>
               </div>
