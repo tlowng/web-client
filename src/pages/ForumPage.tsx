@@ -9,6 +9,10 @@ import { Input } from '@/components/ui/input';
 import { useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { CreateTopicDialog } from '@/components/create-topic-dialog';
+import { ImmediateCreateTopicTest } from '@/components/immediate-create-topic-test';
+import { CategoryBugDebug } from '@/components/category-bug-debug';
+import { CategoryNavigationTest } from '@/components/category-navigation-test';
+import { FrontendCleanupTool } from '@/components/frontend-cleanup-tool';
 
 export default function ForumPage() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -62,6 +66,12 @@ export default function ForumPage() {
 
   return (
     <div className="p-4 space-y-6">
+      {/* TEMPORARY DEBUG COMPONENT */}
+      <ImmediateCreateTopicTest />
+      <CategoryBugDebug />
+      <CategoryNavigationTest />
+      <FrontendCleanupTool />
+
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">Forum</h1>
         <CreateTopicDialog categories={categories || []}>
