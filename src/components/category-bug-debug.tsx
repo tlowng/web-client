@@ -6,8 +6,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useNavigate } from 'react-router-dom';
-import { toast } from 'sonner';
 import axios from 'axios';
 import { getForumCategories, getForumTopics } from '@/api';
 
@@ -15,7 +13,6 @@ export function CategoryBugDebug() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState('');
   const [testCategoryId, setTestCategoryId] = useState('6879168bad86e470dc1e8b4b');
-  const navigate = useNavigate();
 
   const logResult = (message: string) => {
     console.log(message);
