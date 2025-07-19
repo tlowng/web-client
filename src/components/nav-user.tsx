@@ -8,6 +8,7 @@ import {
   LogOut,
   Sparkles,
   Loader2,
+  User,
 } from "lucide-react"
 
 import {
@@ -147,6 +148,12 @@ export function NavUser() {
                 <DropdownMenuItem>
                   <BadgeCheck />
                   Account
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to={`/forum/profile/${currentUser._id}`}>
+                    <User/>
+                    My Profile
+                  </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
                   <CreditCard />

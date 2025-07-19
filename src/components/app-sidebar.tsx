@@ -8,6 +8,7 @@ import {
 } from "lucide-react"
 import { Link } from 'react-router-dom';
 
+import { Trophy, BarChart3 } from 'lucide-react';
 import { NavMain } from "@/components/nav-main"
 import { NavUser } from "@/components/nav-user"
 import {
@@ -39,6 +40,16 @@ const navData = {
       icon: FileText,
     },
     {
+      title: "Leaderboard",
+      url: "/forum/leaderboard",
+      icon: Trophy,
+    },
+    {
+      title: "Forum Stats",
+      url: "/forum/stats",
+      icon: BarChart3, 
+    },
+    {
       title: "Members",
       url: "/members",
       icon: Users,
@@ -49,7 +60,7 @@ const navData = {
       icon: GitFork,
     },
   ],
-}
+};
 
 function Brand() {
     const { state } = useSidebar()

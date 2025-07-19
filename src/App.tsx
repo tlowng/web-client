@@ -24,6 +24,9 @@ import ForumTopicPage from './pages/ForumTopicPage';
 import UserSubmissionsPage from './pages/UserSubmissionsPage';
 import MembersPage from './pages/MembersPage';
 import GroupsPage from './pages/GroupsPage';
+import ForumLeaderboardPage from './pages/ForumLeaderboardPage';
+import ForumStatsPage from './pages/ForumStatsPage';
+import UserProfilePage from './pages/UserProfilePage';
 
 export default function App() {
   return (
@@ -47,6 +50,7 @@ export default function App() {
                 <ErrorBoundary>
                   <Routes>
                     <Route path="/" element={<ForumPage />} />
+                    <Route path="/forum" element={<ForumPage />} />
                     <Route path="/forum/:slug" element={<ForumCategoryPage />} />
                     <Route path="/forum/topic/:slug" element={<ForumTopicPage />} />
                     <Route path="/problems" element={<ProblemsPage />} />
@@ -57,6 +61,9 @@ export default function App() {
                     <Route path="/register" element={<RegisterPage />} />
                     <Route path="/members" element={<MembersPage />} />
                     <Route path="/groups" element={<GroupsPage />} />
+                    <Route path="/forum/leaderboard" element={<ForumLeaderboardPage />} />
+                    <Route path="/forum/stats" element={<ForumStatsPage />} />
+                    <Route path="/forum/profile/:userId" element={<UserProfilePage />} />
                   </Routes>
                 </ErrorBoundary>
               </div>

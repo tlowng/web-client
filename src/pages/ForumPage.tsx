@@ -13,6 +13,8 @@ import { ImmediateCreateTopicTest } from '@/components/immediate-create-topic-te
 import { CategoryBugDebug } from '@/components/category-bug-debug';
 import { CategoryNavigationTest } from '@/components/category-navigation-test';
 import { FrontendCleanupTool } from '@/components/frontend-cleanup-tool';
+import { ForumQuickLinks } from '@/components/forum-quick-links';
+import { Trophy, BarChart3 } from 'lucide-react';
 
 export default function ForumPage() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -71,7 +73,7 @@ export default function ForumPage() {
       <CategoryBugDebug />
       <CategoryNavigationTest />
       <FrontendCleanupTool />
-
+      <ForumQuickLinks />
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">Forum</h1>
         <CreateTopicDialog categories={categories || []}>
@@ -98,6 +100,21 @@ export default function ForumPage() {
       </form>
 
       <section>
+        <div className="flex gap-2">
+          <Button asChild variant="outline" size="sm">
+            <Link to="/forum/leaderboard">
+              <Trophy className="h-4 w-4 mr-2" />
+              Leaderboard
+            </Link>
+          </Button>
+          
+          <Button asChild variant="outline" size="sm">
+            <Link to="/forum/stats">
+              <BarChart3 className="h-4 w-4 mr-2" />
+              Stats
+            </Link>
+          </Button>
+        </div>
         <h2 className="text-2xl font-semibold mb-4">Categories</h2>
         {categoriesLoading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

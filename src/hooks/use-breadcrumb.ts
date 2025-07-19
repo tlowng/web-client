@@ -22,7 +22,11 @@ const routeConfig: Record<string, { title: string; parent?: string }> = {
   '/register': { title: 'Register', parent: '/' },
   '/members': { title: 'Members', parent: '/' },
   '/groups': { title: 'Groups', parent: '/' },
+  '/forum/leaderboard': { title: 'Leaderboard', parent: '/' },
+  '/forum/stats': { title: 'Statistics', parent: '/' },
+  '/forum/profile/:userId': { title: 'User Profile', parent: '/forum/leaderboard' },
 };
+
 
 export function useBreadcrumb(): BreadcrumbItem[] {
   const location = useLocation();
