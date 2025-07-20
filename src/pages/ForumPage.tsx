@@ -9,11 +9,11 @@ import { Input } from '@/components/ui/input';
 import { useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { CreateTopicDialog } from '@/components/create-topic-dialog';
-import { ImmediateCreateTopicTest } from '@/components/immediate-create-topic-test';
+/*import { ImmediateCreateTopicTest } from '@/components/immediate-create-topic-test';
 import { CategoryBugDebug } from '@/components/category-bug-debug';
 import { CategoryNavigationTest } from '@/components/category-navigation-test';
 import { FrontendCleanupTool } from '@/components/frontend-cleanup-tool';
-import { ForumQuickLinks } from '@/components/forum-quick-links';
+import { ForumQuickLinks } from '@/components/forum-quick-links';*/
 import { Trophy, BarChart3 } from 'lucide-react';
 
 export default function ForumPage() {
@@ -68,14 +68,16 @@ export default function ForumPage() {
 
   return (
     <div className="p-4 space-y-6">
-      {/* TEMPORARY DEBUG COMPONENT */}
+      {/* TEMPORARY DEBUG COMPONENT 
       <ImmediateCreateTopicTest />
       <CategoryBugDebug />
       <CategoryNavigationTest />
       <FrontendCleanupTool />
       <ForumQuickLinks />
+      */}
+      
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Forum</h1>
+        <h1 className="text-3xl font-bold">Newsfeed</h1>
         <CreateTopicDialog categories={categories || []}>
           <Button>New Topic</Button>
         </CreateTopicDialog>
@@ -100,7 +102,7 @@ export default function ForumPage() {
       </form>
 
       <section>
-        <div className="flex gap-2">
+        <div className="flex gap-2 mb-5">
           <Button asChild variant="outline" size="sm">
             <Link to="/forum/leaderboard">
               <Trophy className="h-4 w-4 mr-2" />

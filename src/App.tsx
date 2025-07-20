@@ -28,7 +28,7 @@ import GroupsPage from './pages/GroupsPage';
 import ForumLeaderboardPage from './pages/ForumLeaderboardPage';
 import ForumStatsPage from './pages/ForumStatsPage';
 import UserProfilePage from './pages/UserProfilePage';
-
+import AdminProblemsPage from './pages/AdminProblemsPage';
 
 export default function App() {
   return (
@@ -67,6 +67,7 @@ export default function App() {
                     <Route path="/forum/stats" element={<ForumStatsPage />} />
                     <Route path="/forum/profile/:userId" element={<UserProfilePage />} />
                     <Route path="/admin" element={<AdminPanel />} />
+                    <Route path="/admin/problems" element={<AdminProblemsPage/>} />
                   </Routes>
                 </ErrorBoundary>
               </div>
