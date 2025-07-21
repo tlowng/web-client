@@ -6,8 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
-import { handleApiError } from '@/utils/error-handler';
-import axios from 'axios';
+import { createForumCategory } from '@/api';
 
 interface CreateCategoryDialogProps {
   children: React.ReactNode;
@@ -30,17 +29,7 @@ export function CreateCategoryDialog({ children, onCategoryCreated }: CreateCate
     setLoading(true);
 
     try {
-      const token = localStorage.getItem('token');
-      await axios.post(
-        `${import.meta.env.VITE_API_URL}/forum/categories`,
-        formData,
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            'x-auth-token': token
-          }
-        }
-      );
+      await createForumCategory(formData);
 
       toast.success('Category created successfully!');
       setOpen(false);
@@ -48,8 +37,7 @@ export function CreateCategoryDialog({ children, onCategoryCreated }: CreateCate
       onCategoryCreated?.();
       
     } catch (error: any) {
-      const message = handleApiError(error);
-      toast.error(message);
+      toast.error(error.response?.data?.message || 'Failed to create category.');
     } finally {
       setLoading(false);
     }

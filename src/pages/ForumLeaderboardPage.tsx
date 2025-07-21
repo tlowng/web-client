@@ -10,30 +10,18 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Trophy, Medal, Award, Star, MessageSquare, FileText, TrendingUp, Users, MapPin, ExternalLink } from 'lucide-react';
+import { Trophy, Star, MessageSquare, FileText, TrendingUp, Users, MapPin, ExternalLink } from 'lucide-react';
 import { useBreadcrumbTitle } from '@/contexts/breadcrumb-context';
+import type { ForumProfile, UserProfile } from '@/types';
+import { getRankIcon, getRankBadgeVariant, getUserTitle, formatLastSeen } from '@/utils/ui-helpers.tsx';
 
-interface LeaderboardProfile {
-  _id: string;
-  user: {
-    _id: string;
-    username: string;
-    email: string;
-    role: string;
-  };
-  signature?: string;
-  title?: string;
-  location?: string;
-  website?: string;
-  githubProfile?: string;
-  postCount: number;
-  topicCount: number;
-  reputation: number;
-  lastSeen: string;
+// Define the shape of a single leaderboard entry based on API
+interface LeaderboardEntry extends ForumProfile {
+  user: UserProfile; // The 'user' field is populated
 }
 
 interface LeaderboardData {
-  profiles: LeaderboardProfile[];
+  profiles: LeaderboardEntry[];
   pagination: {
     page: number;
     limit: number;
@@ -50,6 +38,7 @@ export default function ForumLeaderboardPage() {
   useBreadcrumbTitle('Forum Leaderboard');
 
   const fetchLeaderboard = useCallback(async () => {
+    // This now correctly expects the API's return type
     return await getForumLeaderboard({
       type: sortType,
       page,
@@ -66,57 +55,6 @@ export default function ForumLeaderboardPage() {
   const handleSortChange = (newSort: string) => {
     setSortType(newSort as 'reputation' | 'posts' | 'topics');
     setPage(1); // Reset to first page when changing sort
-  };
-
-  const getRankIcon = (index: number) => {
-    switch (index) {
-      case 0:
-        return <Trophy className="h-5 w-5 text-yellow-500" />;
-      case 1:
-        return <Medal className="h-5 w-5 text-gray-400" />;
-      case 2:
-        return <Award className="h-5 w-5 text-amber-600" />;
-      default:
-        return <span className="text-lg font-bold text-muted-foreground">#{index + 1}</span>;
-    }
-  };
-
-  const getRankBadgeVariant = (index: number) => {
-    switch (index) {
-      case 0:
-        return 'default'; // Gold
-      case 1:
-        return 'secondary'; // Silver
-      case 2:
-        return 'outline'; // Bronze
-      default:
-        return 'outline';
-    }
-  };
-
-  const getUserTitle = (profile: LeaderboardProfile) => {
-    if (profile.title) return profile.title;
-    
-    // Auto-generate title based on reputation
-    if (profile.reputation >= 5000) return 'Forum Legend';
-    if (profile.reputation >= 2000) return 'Expert Contributor';
-    if (profile.reputation >= 1000) return 'Senior Member';
-    if (profile.reputation >= 500) return 'Active Member';
-    if (profile.reputation >= 100) return 'Regular Member';
-    return 'New Member';
-  };
-
-  const formatLastSeen = (dateString: string) => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-    
-    if (diffDays === 0) return 'Today';
-    if (diffDays === 1) return 'Yesterday';
-    if (diffDays < 7) return `${diffDays} days ago`;
-    if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
-    return date.toLocaleDateString();
   };
 
   if (error) {
@@ -287,7 +225,7 @@ export default function ForumLeaderboardPage() {
                           <div className="flex items-center gap-3">
                             <Avatar className="h-10 w-10">
                               <AvatarImage 
-                                src={`https://github.com/${profile.user.username}.png`}
+                                src={profile.avatar || `https://github.com/${profile.user.username}.png`}
                                 alt={profile.user.username}
                               />
                               <AvatarFallback>
@@ -346,7 +284,7 @@ export default function ForumLeaderboardPage() {
                         
                         <TableCell className="text-center">
                           <span className="text-sm text-muted-foreground">
-                            {formatLastSeen(profile.lastSeen)}
+                            {profile.lastSeen ? formatLastSeen(profile.lastSeen) : 'Never'}
                           </span>
                         </TableCell>
                         

@@ -38,7 +38,8 @@ import { useFetch } from '@/hooks/use-fetch';
 import { getProblems, deleteProblem } from '@/api';
 import { CreateProblemDialog } from './create-problem-dialog';
 import { toast } from 'sonner';
-import type { ProblemData } from '@/api';
+import type { ProblemData } from '@/types';
+import { getDifficultyVariant, getDifficultyColor } from '@/utils/ui-helpers.tsx';
 
 export function AdminProblemsList() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -66,32 +67,6 @@ export function AdminProblemsList() {
     refetch 
   } = useFetch<ProblemData[]>(fetchProblems, [], [searchTerm, difficultyFilter]);
 
-  const getDifficultyVariant = (difficulty: string) => {
-    switch (difficulty.toLowerCase()) {
-      case 'easy':
-        return 'default';
-      case 'medium':
-        return 'secondary';
-      case 'hard':
-        return 'destructive';
-      default:
-        return 'outline';
-    }
-  };
-
-  const getDifficultyColor = (difficulty: string) => {
-    switch (difficulty.toLowerCase()) {
-      case 'easy':
-        return 'text-green-600';
-      case 'medium':
-        return 'text-yellow-600';
-      case 'hard':
-        return 'text-red-600';
-      default:
-        return 'text-gray-600';
-    }
-  };
-
   const handleDeleteProblem = async (problemId: string, title: string) => {
     if (!window.confirm(`Are you sure you want to delete "${title}"? This action cannot be undone.`)) {
       return;
@@ -114,12 +89,6 @@ export function AdminProblemsList() {
     toast.success('Problem created successfully!');
     await refetch(); // Refresh the list
   };
-
-  const filteredProblems = problems?.filter(problem => {
-    if (!searchTerm.trim()) return true;
-    return problem.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-           problem.description.toLowerCase().includes(searchTerm.toLowerCase());
-  });
 
   return (
     <div className="space-y-6">
@@ -197,7 +166,7 @@ export function AdminProblemsList() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
-            <span>Problems ({filteredProblems?.length || 0})</span>
+            <span>Problems ({problems?.length || 0})</span>
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -226,7 +195,7 @@ export function AdminProblemsList() {
                 </Button>
               </div>
             </div>
-          ) : !filteredProblems || filteredProblems.length === 0 ? (
+          ) : !problems || problems.length === 0 ? (
             <div className="text-center py-8">
               <TestTube className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
               <p className="text-muted-foreground mb-4">
@@ -258,7 +227,7 @@ export function AdminProblemsList() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredProblems.map((problem) => (
+                  {problems.map((problem) => (
                     <TableRow key={problem._id}>
                       <TableCell>
                         <div>
@@ -437,7 +406,7 @@ export function AdminProblemsList() {
       </Card>
 
       {/* Statistics */}
-      {filteredProblems && filteredProblems.length > 0 && (
+      {problems && problems.length > 0 && (
         <Card>
           <CardHeader>
             <CardTitle>Statistics</CardTitle>
@@ -446,28 +415,28 @@ export function AdminProblemsList() {
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div className="text-center p-4 bg-blue-50 rounded-lg">
                 <div className="text-2xl font-bold text-blue-600">
-                  {filteredProblems.length}
+                  {problems.length}
                 </div>
                 <div className="text-sm text-blue-600/80">Total Problems</div>
               </div>
               
               <div className="text-center p-4 bg-green-50 rounded-lg">
                 <div className="text-2xl font-bold text-green-600">
-                  {filteredProblems.filter(p => p.difficulty === 'easy').length}
+                  {problems.filter(p => p.difficulty === 'easy').length}
                 </div>
                 <div className="text-sm text-green-600/80">Easy</div>
               </div>
               
               <div className="text-center p-4 bg-yellow-50 rounded-lg">
                 <div className="text-2xl font-bold text-yellow-600">
-                  {filteredProblems.filter(p => p.difficulty === 'medium').length}
+                  {problems.filter(p => p.difficulty === 'medium').length}
                 </div>
                 <div className="text-sm text-yellow-600/80">Medium</div>
               </div>
               
               <div className="text-center p-4 bg-red-50 rounded-lg">
                 <div className="text-2xl font-bold text-red-600">
-                  {filteredProblems.filter(p => p.difficulty === 'hard').length}
+                  {problems.filter(p => p.difficulty === 'hard').length}
                 </div>
                 <div className="text-sm text-red-600/80">Hard</div>
               </div>

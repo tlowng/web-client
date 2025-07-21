@@ -23,7 +23,8 @@ import {
   Zap
 } from 'lucide-react';
 import { useBreadcrumbTitle } from '@/contexts/breadcrumb-context';
-import type { ForumTopic } from '@/api';
+import type { ForumTopic } from '@/types';
+import { formatNumber, getActivityLevel, calculateEngagementRate } from '@/utils/ui-helpers';
 
 interface ForumStatsData {
   overview: {
@@ -51,30 +52,6 @@ export default function ForumStatsPage() {
     getForumStats,
     null
   );
-
-  const formatNumber = (num: number) => {
-    if (num >= 1000000) {
-      return (num / 1000000).toFixed(1) + 'M';
-    }
-    if (num >= 1000) {
-      return (num / 1000).toFixed(1) + 'K';
-    }
-    return num.toString();
-  };
-
-  const getActivityLevel = (count: number) => {
-    if (count >= 100) return { level: 'Very High', color: 'text-red-500', bg: 'bg-red-100' };
-    if (count >= 50) return { level: 'High', color: 'text-orange-500', bg: 'bg-orange-100' };
-    if (count >= 25) return { level: 'Medium', color: 'text-yellow-500', bg: 'bg-yellow-100' };
-    if (count >= 10) return { level: 'Low', color: 'text-green-500', bg: 'bg-green-100' };
-    return { level: 'Very Low', color: 'text-gray-500', bg: 'bg-gray-100' };
-  };
-
-  const calculateEngagementRate = () => {
-    if (!stats) return 0;
-    const { posts, topics, users } = stats.overview;
-    return users > 0 ? ((posts + topics) / users).toFixed(1) : '0';
-  };
 
   if (error) {
     return (
@@ -216,7 +193,7 @@ export default function ForumStatsPage() {
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">Engagement Rate</p>
-                    <p className="text-2xl font-bold">{calculateEngagementRate()}</p>
+                    <p className="text-2xl font-bold">{calculateEngagementRate(stats)}</p>
                     <p className="text-xs text-muted-foreground">posts per user</p>
                   </div>
                 </div>

@@ -1,5 +1,5 @@
 // src/components/advanced-search.tsx
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -7,9 +7,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { Search, X } from 'lucide-react';
 import { searchForumTopics } from '@/api';
-import { handleApiError } from '@/utils/error-handler';
 import { toast } from 'sonner';
-import type { ForumTopic, ForumCategory } from '@/api';
+import type { ForumTopic, ForumCategory } from '@/types';
 
 interface AdvancedSearchProps {
   categories: ForumCategory[];
@@ -24,18 +23,18 @@ export function AdvancedSearch({ categories, onResults, onClear }: AdvancedSearc
   const [tagInput, setTagInput] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const addTag = () => {
+  const addTag = useCallback(() => {
     if (tagInput.trim() && !tags.includes(tagInput.trim())) {
-      setTags([...tags, tagInput.trim()]);
+      setTags(prevTags => [...prevTags, tagInput.trim()]);
       setTagInput('');
     }
-  };
+  }, [tagInput, tags]);
 
-  const removeTag = (tag: string) => {
-    setTags(tags.filter(t => t !== tag));
-  };
+  const removeTag = useCallback((tag: string) => {
+    setTags(prevTags => prevTags.filter(t => t !== tag));
+  }, []);
 
-  const handleSearch = async () => {
+  const handleSearch = useCallback(async () => {
     if (!query.trim()) {
       toast.error('Please enter a search query');
       return;
@@ -53,20 +52,19 @@ export function AdvancedSearch({ categories, onResults, onClear }: AdvancedSearc
       onResults(results);
       toast.success(`Found ${results.length} results`);
     } catch (error: any) {
-      const message = handleApiError(error);
-      toast.error(message);
+        toast.error(error.response?.data?.message || 'Failed to search topics.');
     } finally {
       setLoading(false);
     }
-  };
+  }, [query, selectedCategory, tags, onResults]);
 
-  const handleClear = () => {
+  const handleClear = useCallback(() => {
     setQuery('');
     setSelectedCategory('');
     setTags([]);
     setTagInput('');
     onClear();
-  };
+  }, [onClear]);
 
   return (
     <Card>

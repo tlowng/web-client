@@ -1,4 +1,4 @@
-// src/components/admin/admin-panel.tsx (Final Version)
+// src/components/admin/admin-panel.tsx
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -20,52 +20,29 @@ import {
   ExternalLink
 } from 'lucide-react';
 import { getMe } from '@/api';
-import type { UserProfile } from '@/api';
+import type { UserProfile } from '@/types';
+import { withAdminAuth } from '@/components/auth/withAdminAuth';
 
-export function AdminPanel() {
-  const [currentUser, setCurrentUser] = useState<UserProfile | null>(null);
-  const [loading, setLoading] = useState(true);
+function AdminPanelContent() {
+    const [currentUser, setCurrentUser] = useState<UserProfile | null>(null);
 
-  useEffect(() => {
-    const checkAdminAccess = async () => {
-      try {
-        const user = await getMe();
-        setCurrentUser(user);
-      } catch (error) {
-        console.error('Failed to check admin access:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    
-    checkAdminAccess();
-  }, []);
+    useEffect(() => {
+        const fetchUser = async () => {
+            try {
+                const user = await getMe();
+                setCurrentUser(user);
+            } catch (error) {
+                console.error('Failed to fetch user:', error);
+            }
+        };
+        fetchUser();
+    }, []);
 
-  if (loading) {
-    return (
-      <Card>
-        <CardContent className="p-6 text-center">
-          <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full mx-auto"></div>
-          <p className="mt-2">Loading admin panel...</p>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  if (!currentUser || currentUser.role !== 'admin') {
-    return (
-      <Card className="border-red-200">
-        <CardContent className="p-6 text-center">
-          <Shield className="h-12 w-12 text-red-500 mx-auto mb-4" />
-          <p className="text-red-600">Access denied. Admin privileges required.</p>
-        </CardContent>
-      </Card>
-    );
-  }
 
   const handleCategoryCreated = () => {
     // Refresh categories list if needed
-    window.location.reload();
+    // For now, just log a message
+    console.log('Category created successfully');
   };
 
   const handleProblemCreated = () => {
@@ -83,7 +60,7 @@ export function AdminPanel() {
             Admin Dashboard
           </CardTitle>
           <p className="text-muted-foreground">
-            Welcome back, <strong>{currentUser.username}</strong>. Manage your platform from here.
+            Welcome back, <strong>{currentUser?.username}</strong>. Manage your platform from here.
           </p>
         </CardHeader>
       </Card>
@@ -281,3 +258,5 @@ export function AdminPanel() {
     </div>
   );
 }
+
+export const AdminPanel = withAdminAuth(AdminPanelContent);

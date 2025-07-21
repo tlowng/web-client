@@ -22,13 +22,9 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
-import { handleApiError } from '@/utils/error-handler';
+import { createProblem } from '@/api';
 import { Plus, X, TestTube, Clock, MemoryStick } from 'lucide-react';
-
-interface TestCase {
-  input: string;
-  output: string;
-}
+import type { TestCase } from '@/types';
 
 interface CreateProblemDialogProps {
   children: React.ReactNode;
@@ -41,7 +37,7 @@ export function CreateProblemDialog({ children, onProblemCreated }: CreateProble
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    difficulty: 'easy',
+    difficulty: 'easy' as 'easy' | 'medium' | 'hard',
     timeLimit: 1000,
     memoryLimit: 256,
   });
@@ -127,15 +123,13 @@ export function CreateProblemDialog({ children, onProblemCreated }: CreateProble
       const validTestCases = testCases.filter(tc => tc.input.trim() && tc.output.trim());
 
       const problemData = {
+        ...formData,
         title: formData.title.trim(),
         description: formData.description.trim(),
-        difficulty: formData.difficulty,
-        timeLimit: formData.timeLimit,
-        memoryLimit: formData.memoryLimit,
         testCases: validTestCases,
       };
 
-      console.log('Creating problem:', problemData);
+      await createProblem(problemData);
       
       toast.success('Problem created successfully!');
       setOpen(false);
@@ -154,8 +148,7 @@ export function CreateProblemDialog({ children, onProblemCreated }: CreateProble
       
     } catch (error: any) {
       console.error('Failed to create problem:', error);
-      const message = handleApiError(error);
-      toast.error(message);
+      toast.error(error.response?.data?.message || 'Failed to create problem.');
     } finally {
       setLoading(false);
     }
@@ -229,7 +222,7 @@ export function CreateProblemDialog({ children, onProblemCreated }: CreateProble
                   <Label htmlFor="difficulty">Difficulty *</Label>
                   <Select
                     value={formData.difficulty}
-                    onValueChange={(value) => setFormData(prev => ({ ...prev, difficulty: value }))}
+                    onValueChange={(value) => setFormData(prev => ({ ...prev, difficulty: value as 'easy' | 'medium' | 'hard' }))}
                   >
                     <SelectTrigger id="difficulty">
                       <SelectValue />

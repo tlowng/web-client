@@ -1,34 +1,36 @@
 // src/App.tsx
-import { AppSidebar } from "@/components/app-sidebar"
-import { Separator } from "@/components/ui/separator"
-import {
-  SidebarInset,
-  SidebarProvider,
-  SidebarTrigger,
-} from "@/components/ui/sidebar"
-import { Toaster } from "@/components/ui/sonner";
-import { DynamicBreadcrumb } from "@/components/dynamic-breadcrumb";
-import { BreadcrumbProvider } from "@/contexts/breadcrumb-context";
-import { ErrorBoundary } from "@/components/error-boundary";
-
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+
+// UI Components
+import { Separator } from "@/components/ui/separator";
+import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { Toaster } from "@/components/ui/sonner";
+
+// App Components
+import { AppSidebar } from "@/components/app-sidebar";
+import { DynamicBreadcrumb } from "@/components/dynamic-breadcrumb";
+import { ErrorBoundary } from "@/components/error-boundary";
 import { AdminPanel } from '@/components/admin/admin-panel';
 
-import ProblemsPage from './pages/ProblemsPage';
-import ProblemDetailPage from './pages/ProblemDetailPage';
-import SubmissionDetailPage from './pages/SubmissionDetailPage';
-import LoginPage from './pages/LoginPage';
-import RegisterPage from './pages/RegisterPage';
-import ForumPage from './pages/ForumPage';
-import ForumCategoryPage from './pages/ForumCategoryPage';
-import ForumTopicPage from './pages/ForumTopicPage';
-import UserSubmissionsPage from './pages/UserSubmissionsPage';
-import MembersPage from './pages/MembersPage';
-import GroupsPage from './pages/GroupsPage';
-import ForumLeaderboardPage from './pages/ForumLeaderboardPage';
-import ForumStatsPage from './pages/ForumStatsPage';
-import UserProfilePage from './pages/UserProfilePage';
+// Contexts
+import { BreadcrumbProvider } from "@/contexts/breadcrumb-context";
+
+// Pages
 import AdminProblemsPage from './pages/AdminProblemsPage';
+import ForumCategoryPage from './pages/ForumCategoryPage';
+import ForumLeaderboardPage from './pages/ForumLeaderboardPage';
+import ForumPage from './pages/ForumPage';
+import ForumStatsPage from './pages/ForumStatsPage';
+import ForumTopicPage from './pages/ForumTopicPage';
+import GroupsPage from './pages/GroupsPage';
+import LoginPage from './pages/LoginPage';
+import MembersPage from './pages/MembersPage';
+import ProblemDetailPage from './pages/ProblemDetailPage';
+import ProblemsPage from './pages/ProblemsPage';
+import RegisterPage from './pages/RegisterPage';
+import SubmissionDetailPage from './pages/SubmissionDetailPage';
+import UserProfilePage from './pages/UserProfilePage';
+import UserSubmissionsPage from './pages/UserSubmissionsPage';
 
 export default function App() {
   return (
@@ -49,27 +51,31 @@ export default function App() {
                 </div>
               </header>
               <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-                <ErrorBoundary>
-                  <Routes>
-                    <Route path="/" element={<ForumPage />} />
-                    <Route path="/forum" element={<ForumPage />} />
-                    <Route path="/forum/:slug" element={<ForumCategoryPage />} />
-                    <Route path="/forum/topic/:slug" element={<ForumTopicPage />} />
-                    <Route path="/problems" element={<ProblemsPage />} />
-                    <Route path="/problems/:id" element={<ProblemDetailPage />} />
-                    <Route path="/submissions/user-submissions" element={<UserSubmissionsPage />} />
-                    <Route path="/submissions/:id" element={<SubmissionDetailPage />} />
-                    <Route path="/login" element={<LoginPage />} />
-                    <Route path="/register" element={<RegisterPage />} />
-                    <Route path="/members" element={<MembersPage />} />
-                    <Route path="/groups" element={<GroupsPage />} />
-                    <Route path="/forum/leaderboard" element={<ForumLeaderboardPage />} />
-                    <Route path="/forum/stats" element={<ForumStatsPage />} />
-                    <Route path="/forum/profile/:userId" element={<UserProfilePage />} />
-                    <Route path="/admin" element={<AdminPanel />} />
-                    <Route path="/admin/problems" element={<AdminProblemsPage/>} />
-                  </Routes>
-                </ErrorBoundary>
+                <Routes>
+                  {/* Forum Routes */}
+                  <Route path="/" element={<ForumPage />} />
+                  <Route path="/forum/:slug" element={<ForumCategoryPage />} />
+                  <Route path="/forum/topic/:slug" element={<ForumTopicPage />} />
+                  <Route path="/forum/leaderboard" element={<ForumLeaderboardPage />} />
+                  <Route path="/forum/stats" element={<ForumStatsPage />} />
+                  <Route path="/forum/profile/:userId" element={<UserProfilePage />} />
+
+                  {/* Problem & Submission Routes */}
+                  <Route path="/problems" element={<ProblemsPage />} />
+                  <Route path="/problems/:id" element={<ProblemDetailPage />} />
+                  <Route path="/submissions/user-submissions" element={<UserSubmissionsPage />} />
+                  <Route path="/submissions/:id" element={<SubmissionDetailPage />} />
+                  
+                  {/* User & Auth Routes */}
+                  <Route path="/login" element={<LoginPage />} />
+                  <Route path="/register" element={<RegisterPage />} />
+                  <Route path="/members" element={<MembersPage />} />
+                  <Route path="/groups" element={<GroupsPage />} />
+
+                  {/* Admin Routes */}
+                  <Route path="/admin" element={<AdminPanel />} />
+                  <Route path="/admin/problems" element={<AdminProblemsPage/>} />
+                </Routes>
               </div>
             </SidebarInset>
           </SidebarProvider>

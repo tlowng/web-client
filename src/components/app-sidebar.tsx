@@ -1,69 +1,21 @@
-import * as React from "react"
-import {
-  Home,
-  List,
-  FileText,
-  Users,
-  GitFork,
-} from "lucide-react"
+// src/components/app-sidebar.tsx
+import * as React from "react";
 import { Link } from 'react-router-dom';
 
-import { Trophy, BarChart3 } from 'lucide-react';
-import { NavMain } from "@/components/nav-main"
-import { NavUser } from "@/components/nav-user"
+import { NavMain } from "@/components/nav-main";
+import { NavUser } from "@/components/nav-user";
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
   useSidebar,
-} from "@/components/ui/sidebar"
+} from "@/components/ui/sidebar";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { navData } from "@/config/nav";
 
-// Updated data for navigation
-// The active state will be determined dynamically in NavMain
-const navData = {
-  navMain: [
-    {
-      title: "Home (Forum)",
-      url: "/",
-      icon: Home,
-    },
-    {
-      title: "Problem List",
-      url: "/problems",
-      icon: List,
-    },
-    {
-      title: "My Submissions",
-      url: "/submissions/user-submissions",
-      icon: FileText,
-    },
-    {
-      title: "Leaderboard",
-      url: "/forum/leaderboard",
-      icon: Trophy,
-    },
-    {
-      title: "Forum Stats",
-      url: "/forum/stats",
-      icon: BarChart3, 
-    },
-    {
-      title: "Members",
-      url: "/members",
-      icon: Users,
-    },
-    {
-      title: "Groups",
-      url: "/groups",
-      icon: GitFork,
-    },
-  ],
-};
-
-function Brand() {
-    const { state } = useSidebar()
+const Brand: React.FC = () => {
+    const { state } = useSidebar();
 
     return (
         <Link to="/">
@@ -73,7 +25,7 @@ function Brand() {
                 <span className="text-xl font-bold text-accent p-2">AwlOJ</span>
             )}
         </Link>
-    )
+    );
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
@@ -92,5 +44,5 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavUser />
       </SidebarFooter>
     </Sidebar>
-  )
+  );
 }

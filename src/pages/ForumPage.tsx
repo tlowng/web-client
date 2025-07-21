@@ -1,20 +1,16 @@
 // src/pages/ForumPage.tsx
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Card, CardContent } from '@/components/ui/card';
 import { useFetch } from '@/hooks/use-fetch';
 import { getForumCategories, getForumTopics, searchForumTopics } from '@/api';
-import type { ForumCategory, ForumTopic } from '@/api';
+import type { ForumCategory, ForumTopic } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { CreateTopicDialog } from '@/components/create-topic-dialog';
-/*import { ImmediateCreateTopicTest } from '@/components/immediate-create-topic-test';
-import { CategoryBugDebug } from '@/components/category-bug-debug';
-import { CategoryNavigationTest } from '@/components/category-navigation-test';
-import { FrontendCleanupTool } from '@/components/frontend-cleanup-tool';
-import { ForumQuickLinks } from '@/components/forum-quick-links';*/
 import { Trophy, BarChart3 } from 'lucide-react';
+import { CategoryList } from '@/components/forum/CategoryList';
+import { TopicList } from '@/components/forum/TopicList';
 
 export default function ForumPage() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -68,13 +64,6 @@ export default function ForumPage() {
 
   return (
     <div className="p-4 space-y-6">
-      {/* TEMPORARY DEBUG COMPONENT 
-      <ImmediateCreateTopicTest />
-      <CategoryBugDebug />
-      <CategoryNavigationTest />
-      <FrontendCleanupTool />
-      <ForumQuickLinks />
-      */}
       
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">Newsfeed</h1>
@@ -118,59 +107,7 @@ export default function ForumPage() {
           </Button>
         </div>
         <h2 className="text-2xl font-semibold mb-4">Categories</h2>
-        {categoriesLoading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {[...Array(6)].map((_, i) => (
-              <Card key={i}>
-                <CardHeader>
-                  <div className="h-6 bg-muted animate-pulse rounded w-3/4"></div>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2">
-                    <div className="h-4 bg-muted animate-pulse rounded"></div>
-                    <div className="h-3 bg-muted animate-pulse rounded w-1/2"></div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        ) : categoriesError ? (
-          <div className="text-red-500">
-            <p>Error loading categories: {categoriesError}</p>
-            <Button 
-              variant="outline" 
-              onClick={() => window.location.reload()}
-              className="mt-2"
-            >
-              Retry
-            </Button>
-          </div>
-        ) : !categories || categories.length === 0 ? (
-          <p className="text-muted-foreground">No categories found.</p>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {categories.map((category: ForumCategory) => (
-              <Link to={`/forum/${category.slug}`} key={category._id}>
-                <Card className="hover:shadow-lg transition-shadow cursor-pointer">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <span style={{ color: category.color }}>{category.icon}</span>
-                      {category.name}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-muted-foreground">{category.description}</p>
-                    {category.topicCount !== undefined && (
-                      <div className="mt-2 text-xs text-muted-foreground">
-                        {category.topicCount} topics • {category.postCount || 0} posts
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              </Link>
-            ))}
-          </div>
-        )}
+        <CategoryList categories={categories || []} loading={categoriesLoading} error={categoriesError} />
       </section>
 
       <section>
@@ -179,112 +116,23 @@ export default function ForumPage() {
         </h2>
         <Card>
           <CardContent className="pt-1">
-            {displayLoading ? (
-              <div className="p-6">
-                <div className="space-y-3">
-                  {[...Array(5)].map((_, i) => (
-                    <div key={i} className="flex justify-between">
-                      <div className="space-y-1 flex-1">
-                        <div className="h-4 bg-muted animate-pulse rounded w-3/4"></div>
-                        <div className="h-3 bg-muted animate-pulse rounded w-1/4"></div>
-                      </div>
-                      <div className="w-20">
-                        <div className="h-4 bg-muted animate-pulse rounded"></div>
-                      </div>
-                    </div>
-                  ))}
+            <TopicList 
+              topics={displayTopics || []} 
+              loading={displayLoading} 
+              error={displayError} 
+              onRetry={() => searchResults !== null ? handleSearch(new Event('submit') as any) : window.location.reload()} 
+            />
+             {searchResults !== null && (!displayTopics || displayTopics.length === 0) && (
+                <div className="text-center pb-6">
+                    <p className="text-muted-foreground">No topics found for your search.</p>
+                    <Button 
+                        variant="outline" 
+                        onClick={clearSearch}
+                        className="mt-2"
+                    >
+                        View All Topics
+                    </Button>
                 </div>
-              </div>
-            ) : displayError ? (
-              <div className="text-red-500 text-center py-6">
-                <p>Error loading topics: {displayError}</p>
-                <Button 
-                  variant="outline" 
-                  onClick={() => searchResults !== null ? handleSearch(new Event('submit') as any) : window.location.reload()}
-                  className="mt-2"
-                >
-                  Retry
-                </Button>
-              </div>
-            ) : !displayTopics || displayTopics.length === 0 ? (
-              <div className="text-center py-6">
-                <p className="text-muted-foreground">
-                  {searchResults !== null ? 'No topics found for your search.' : 'No topics found.'}
-                </p>
-                {searchResults !== null && (
-                  <Button 
-                    variant="outline" 
-                    onClick={clearSearch}
-                    className="mt-2"
-                  >
-                    View All Topics
-                  </Button>
-                )}
-              </div>
-            ) : (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Topic</TableHead>
-                    <TableHead>Category</TableHead>
-                    <TableHead className="text-right">Activity</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {displayTopics.map((topic: ForumTopic) => (
-                    <TableRow key={topic._id}>
-                      <TableCell>
-                        <Link to={`/forum/topic/${topic.slug}`} className="font-medium hover:underline">
-                          {topic.title}
-                        </Link>
-                        <div className="text-sm text-muted-foreground">
-                          by {topic.author.username}
-                        </div>
-                        {topic.tags && topic.tags.length > 0 && (
-                          <div className="flex gap-1 mt-1">
-                            {topic.tags.slice(0, 3).map((tag, index) => (
-                              <span 
-                                key={index}
-                                className="inline-block px-2 py-1 text-xs bg-muted rounded"
-                              >
-                                {tag}
-                              </span>
-                            ))}
-                            {topic.tags.length > 3 && (
-                              <span className="text-xs text-muted-foreground">
-                                +{topic.tags.length - 3} more
-                              </span>
-                            )}
-                          </div>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        {topic.category ? (
-                          <Link 
-                            to={`/forum/${topic.category.slug}`} 
-                            className="hover:underline text-sm"
-                          >
-                            {topic.category.name}
-                          </Link>
-                        ) : (
-                          <span className="text-sm text-muted-foreground">No category</span>
-                        )}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="text-sm">
-                          {(topic.postCount || topic.replyCount || 0)} replies
-                        </div>
-                        <div className="text-sm">
-                          {topic.viewCount} views
-                        </div>
-                        <div className="text-xs text-muted-foreground">
-                          {new Date(topic.lastActivity || topic.createdAt).toLocaleDateString()}
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
             )}
           </CardContent>
         </Card>
