@@ -1,5 +1,4 @@
 // src/api/forum.ts
-import axios from 'axios';
 import api from './client';
 import type { 
     ApiResponse, 
@@ -9,7 +8,10 @@ import type {
     ForumTopicsResponse, 
     PostsResponse, 
     UserWithProfile, 
-    ForumProfile 
+    ForumProfile,
+    LeaderboardResponse,
+    LeaderboardEntry,
+    ForumProfilePopulated
 } from '@/types';
 
 export const getForumCategories = async () => {
@@ -124,26 +126,11 @@ export const getForumLeaderboard = async (params?: {
   type?: 'reputation' | 'posts' | 'topics';
   page?: number;
   limit?: number;
-}) => {
-    const response = await api.get<ApiResponse<{
-      profiles: Array<{
-        _id: string;
-        user: any; //UserProfile;
-        signature?: string;
-        title?: string;
-        location?: string;
-        postCount: number;
-        topicCount: number;
-        reputation: number;
-        lastSeen: string;
-      }>;
-      pagination: {
-        page: number;
-        limit: number;
-        total: number;
-        pages: number;
-      };
-    }>>('/forum/profiles/leaderboard', { params });
+}): Promise<LeaderboardResponse> => {
+    const response = await api.get<ApiResponse<LeaderboardResponse>>(
+      '/forum/profiles/leaderboard', 
+      { params }
+    );
     return response.data.data;
 };
 

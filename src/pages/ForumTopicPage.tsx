@@ -3,17 +3,17 @@ import React from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useFetch } from '@/hooks/use-fetch';
 import { getTopicBySlug, getPostsByTopic, createForumPost, likeForumPost, deleteForumPost } from '@/api';
-import type { ForumTopic, ForumPost } from '@/api';
+import type { ForumTopic, ForumPost, UserProfile } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ThumbsUp, Eye, MessageSquare, Trash2 } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 import { useBreadcrumbTitle } from '@/contexts/breadcrumb-context';
 import { useCallback, useState } from 'react';
 import { toast } from 'sonner';
 import { getMe } from '@/api';
-import type { UserProfile } from '@/api';
 
 export default function ForumTopicPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -178,7 +178,7 @@ export default function ForumTopicPage() {
                   </div>
                   <div className="flex items-center gap-1">
                     <MessageSquare size={14} />
-                    <span>{topic.postCount || topic.replyCount || 0} replies</span>
+                    <span>{topic.replyCount  || topic.replyCount || 0} replies</span>
                   </div>
                 </div>
               </div>
@@ -206,13 +206,10 @@ export default function ForumTopicPage() {
             {topic.tags && topic.tags.length > 0 && (
               <div className="flex gap-2 mt-4 pt-4 border-t">
                 <span className="text-sm text-muted-foreground">Tags:</span>
-                {topic.tags.map((tag, index) => (
-                  <span 
-                    key={index}
-                    className="inline-block px-2 py-1 text-xs bg-muted rounded"
-                  >
+                {topic?.tags?.map((tag: string, index: number) => (
+                  <Badge key={index} variant="outline" className="text-xs">
                     {tag}
-                  </span>
+                  </Badge>
                 ))}
               </div>
             )}

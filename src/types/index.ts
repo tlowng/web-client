@@ -261,16 +261,16 @@ export interface SubmissionData {
   language: string;
 }
 
+export interface Problem extends Omit<ProblemData, '_id'> {
+  _id: string; 
+  acceptance: number; 
+  submissionCount: number; 
+}
+
 export interface SubmissionResult {
   _id: string;
-  userId: {
-    _id: string;
-    username: string;
-  };
-  problemId: {
-    _id: string;
-    title: string;
-  };
+  userId: string;
+  problemId: string;
   code: string;
   language: string;
   status: SubmissionStatus;
@@ -278,7 +278,6 @@ export interface SubmissionResult {
   memoryUsed?: number;
   createdAt: string;
   updatedAt: string;
-  __v: number;
 }
 
 // ==================== FORUM TYPES ====================
@@ -714,6 +713,57 @@ export interface ProblemStats {
   languageDistribution: {
     [language: string]: number;
   };
+}
+
+// Interfaces for populated data (when user field is populated)
+export interface ForumProfilePopulated extends Omit<ForumProfile, 'user'> {
+  user: UserProfile; // user field is populated with full UserProfile object
+}
+
+export interface UserWithProfile {
+  user: UserProfile;
+  profile: ForumProfile;
+  recentActivity?: {
+    topics: ForumTopic[];
+    posts: ForumPost[];
+  };
+}
+
+// Leaderboard specific types
+export interface LeaderboardEntry extends Omit<ForumProfile, 'user'> {
+  user: UserProfile; // populated user data
+}
+
+export interface LeaderboardResponse {
+  profiles: LeaderboardEntry[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    pages: number;
+  };
+}
+
+// Update existing ForumProfile to clarify it's unpopulated
+export interface ForumProfile {
+  _id: string;
+  user: string; // ObjectId as string - NOT populated
+  signature?: string;
+  avatar?: string;
+  title?: string;
+  location?: string;
+  website?: string;
+  githubProfile?: string;
+  postCount: number;
+  topicCount: number;
+  reputation: number;
+  lastSeen: string;
+  preferences: {
+    emailNotifications: boolean;
+    showOnlineStatus: boolean;
+  };
+  createdAt: string;
+  updatedAt: string;
 }
 
 // ==================== EXPORT ALL ====================

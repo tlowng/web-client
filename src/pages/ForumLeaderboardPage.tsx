@@ -1,4 +1,4 @@
-// src/pages/ForumLeaderboardPage.tsx
+// src/pages/ForumLeaderboardPage.tsx - FIXED VERSION
 import { useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { useFetch } from '@/hooks/use-fetch';
@@ -12,23 +12,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Skeleton } from '@/components/ui/skeleton';
 import { Trophy, Star, MessageSquare, FileText, TrendingUp, Users, MapPin, ExternalLink } from 'lucide-react';
 import { useBreadcrumbTitle } from '@/contexts/breadcrumb-context';
-import type { ForumProfile, UserProfile } from '@/types';
-import { getRankIcon, getRankBadgeVariant, getUserTitle, formatLastSeen } from '@/utils/ui-helpers.tsx';
-
-// Define the shape of a single leaderboard entry based on API
-interface LeaderboardEntry extends ForumProfile {
-  user: UserProfile; // The 'user' field is populated
-}
-
-interface LeaderboardData {
-  profiles: LeaderboardEntry[];
-  pagination: {
-    page: number;
-    limit: number;
-    total: number;
-    pages: number;
-  };
-}
+import type { LeaderboardResponse } from '@/types';
+import { getRankIcon, formatLastSeen } from '@/utils/ui-helpers.tsx';
 
 export default function ForumLeaderboardPage() {
   const [sortType, setSortType] = useState<'reputation' | 'posts' | 'topics'>('reputation');
@@ -37,8 +22,7 @@ export default function ForumLeaderboardPage() {
 
   useBreadcrumbTitle('Forum Leaderboard');
 
-  const fetchLeaderboard = useCallback(async () => {
-    // This now correctly expects the API's return type
+  const fetchLeaderboard = useCallback(async (): Promise<LeaderboardResponse> => {
     return await getForumLeaderboard({
       type: sortType,
       page,
@@ -46,7 +30,7 @@ export default function ForumLeaderboardPage() {
     });
   }, [sortType, page, limit]);
 
-  const { data: leaderboardData, loading, error, refetch } = useFetch<LeaderboardData>(
+  const { data: leaderboardData, loading, error, refetch } = useFetch<LeaderboardResponse>(
     fetchLeaderboard,
     null,
     [sortType, page]
@@ -91,90 +75,96 @@ export default function ForumLeaderboardPage() {
             Top contributors in our community
           </p>
         </div>
-        
+
         <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2">
-            <label className="text-sm font-medium">Sort by:</label>
-            <Select value={sortType} onValueChange={handleSortChange}>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="reputation">
-                  <div className="flex items-center gap-2">
-                    <Star className="h-4 w-4" />
-                    Reputation
-                  </div>
-                </SelectItem>
-                <SelectItem value="posts">
-                  <div className="flex items-center gap-2">
-                    <MessageSquare className="h-4 w-4" />
-                    Posts
-                  </div>
-                </SelectItem>
-                <SelectItem value="topics">
-                  <div className="flex items-center gap-2">
-                    <FileText className="h-4 w-4" />
-                    Topics
-                  </div>
-                </SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+          <Select value={sortType} onValueChange={handleSortChange}>
+            <SelectTrigger className="w-48">
+              <SelectValue placeholder="Sort by..." />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="reputation">
+                <div className="flex items-center gap-2">
+                  <Star className="h-4 w-4" />
+                  Reputation
+                </div>
+              </SelectItem>
+              <SelectItem value="posts">
+                <div className="flex items-center gap-2">
+                  <MessageSquare className="h-4 w-4" />
+                  Post Count
+                </div>
+              </SelectItem>
+              <SelectItem value="topics">
+                <div className="flex items-center gap-2">
+                  <FileText className="h-4 w-4" />
+                  Topic Count
+                </div>
+              </SelectItem>
+            </SelectContent>
+          </Select>
+
+          <Button 
+            variant="outline" 
+            onClick={() => refetch()}
+            disabled={loading}
+          >
+            <TrendingUp className="h-4 w-4 mr-2" />
+            Refresh
+          </Button>
         </div>
       </div>
 
-      {/* Stats Summary */}
-      {leaderboardData && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-2">
-                <Users className="h-5 w-5 text-blue-500" />
-                <div>
-                  <p className="text-sm text-muted-foreground">Total Members</p>
-                  <p className="text-2xl font-bold">{leaderboardData.pagination.total}</p>
-                </div>
+      {/* Stats Overview */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              <Users className="h-8 w-8 text-blue-500" />
+              <div>
+                <p className="text-sm text-muted-foreground">Total Users</p>
+                <p className="text-2xl font-bold">
+                  {leaderboardData?.pagination.total || '-'}
+                </p>
               </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-2">
-                <TrendingUp className="h-5 w-5 text-green-500" />
-                <div>
-                  <p className="text-sm text-muted-foreground">Top Reputation</p>
-                  <p className="text-2xl font-bold">
-                    {leaderboardData.profiles[0]?.reputation || 0}
-                  </p>
-                </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              <MessageSquare className="h-8 w-8 text-green-500" />
+              <div>
+                <p className="text-sm text-muted-foreground">Total Posts</p>
+                <p className="text-2xl font-bold">
+                  {leaderboardData?.profiles.reduce((sum, profile) => sum + profile.postCount, 0) || '-'}
+                </p>
               </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-2">
-                <MessageSquare className="h-5 w-5 text-purple-500" />
-                <div>
-                  <p className="text-sm text-muted-foreground">Most Posts</p>
-                  <p className="text-2xl font-bold">
-                    {Math.max(...(leaderboardData.profiles.map(p => p.postCount) || [0]))}
-                  </p>
-                </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              <Star className="h-8 w-8 text-yellow-500" />
+              <div>
+                <p className="text-sm text-muted-foreground">Top Reputation</p>
+                <p className="text-2xl font-bold">
+                  {leaderboardData?.profiles[0]?.reputation || '-'}
+                </p>
               </div>
-            </CardContent>
-          </Card>
-        </div>
-      )}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
 
       {/* Leaderboard Table */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Trophy className="h-5 w-5" />
-            Rankings
+            Community Leaders
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -182,141 +172,119 @@ export default function ForumLeaderboardPage() {
             <div className="space-y-4">
               {Array.from({ length: 10 }).map((_, i) => (
                 <div key={i} className="flex items-center gap-4">
-                  <Skeleton className="h-12 w-12 rounded-full" />
-                  <div className="space-y-2 flex-1">
-                    <Skeleton className="h-4 w-48" />
-                    <Skeleton className="h-3 w-32" />
+                  <Skeleton className="h-10 w-10 rounded-full" />
+                  <div className="flex-1 space-y-2">
+                    <Skeleton className="h-4 w-32" />
+                    <Skeleton className="h-3 w-48" />
                   </div>
-                  <Skeleton className="h-6 w-16" />
+                  <div className="space-y-2">
+                    <Skeleton className="h-4 w-16" />
+                    <Skeleton className="h-3 w-12" />
+                  </div>
                 </div>
               ))}
             </div>
-          ) : !leaderboardData || leaderboardData.profiles.length === 0 ? (
-            <div className="text-center py-8">
-              <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-              <p className="text-muted-foreground">No members found.</p>
+          ) : leaderboardData?.profiles.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              <Users className="h-12 w-12 mx-auto mb-4 opacity-50" />
+              <p>No users found</p>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-16">Rank</TableHead>
-                    <TableHead>Member</TableHead>
-                    <TableHead className="text-center">Reputation</TableHead>
-                    <TableHead className="text-center">Posts</TableHead>
-                    <TableHead className="text-center">Topics</TableHead>
-                    <TableHead className="text-center">Last Seen</TableHead>
-                    <TableHead className="text-center">Profile</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {leaderboardData.profiles.map((profile, index) => {
-                    const globalRank = (page - 1) * limit + index;
-                    return (
-                      <TableRow key={profile._id} className="hover:bg-muted/50">
-                        <TableCell>
-                          <div className="flex items-center justify-center">
-                            {getRankIcon(globalRank)}
-                          </div>
-                        </TableCell>
-                        
-                        <TableCell>
-                          <div className="flex items-center gap-3">
-                            <Avatar className="h-10 w-10">
-                              <AvatarImage 
-                                src={profile.avatar || `https://github.com/${profile.user.username}.png`}
-                                alt={profile.user.username}
-                              />
-                              <AvatarFallback>
-                                {profile.user.username.charAt(0).toUpperCase()}
-                              </AvatarFallback>
-                            </Avatar>
-                            
-                            <div className="space-y-1">
-                              <div className="flex items-center gap-2">
-                                <Link 
-                                  to={`/forum/profile/${profile.user._id}`}
-                                  className="font-medium hover:text-primary transition-colors"
-                                >
-                                  {profile.user.username}
-                                </Link>
-                                {globalRank < 3 && (
-                                  <Badge variant={getRankBadgeVariant(globalRank)}>
-                                    {globalRank === 0 ? '🥇' : globalRank === 1 ? '🥈' : '🥉'}
-                                  </Badge>
-                                )}
-                                {profile.user.role === 'admin' && (
-                                  <Badge variant="destructive" className="text-xs">
-                                    Admin
-                                  </Badge>
-                                )}
-                              </div>
-                              
-                              <div className="text-xs text-muted-foreground">
-                                {getUserTitle(profile)}
-                              </div>
-                              
-                              {profile.location && (
-                                <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                                  <MapPin className="h-3 w-3" />
-                                  {profile.location}
-                                </div>
-                              )}
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-16">Rank</TableHead>
+                  <TableHead>User</TableHead>
+                  <TableHead className="text-center">Reputation</TableHead>
+                  <TableHead className="text-center">Posts</TableHead>
+                  <TableHead className="text-center">Topics</TableHead>
+                  <TableHead className="text-center">Last Seen</TableHead>
+                  <TableHead className="w-20"></TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {leaderboardData?.profiles.map((profile, index) => {
+                  const rank = (leaderboardData.pagination.page - 1) * leaderboardData.pagination.limit + index + 1;
+                  
+                  return (
+                    <TableRow key={profile._id} className="hover:bg-muted/50">
+                      <TableCell className="font-medium">
+                        <div className="flex items-center gap-2">
+                          {getRankIcon(rank)}
+                          <span className={rank <= 3 ? 'font-bold' : ''}>{rank}</span>
+                        </div>
+                      </TableCell>
+                      
+                      <TableCell>
+                        <div className="flex items-center gap-3">
+                          <Avatar className="h-10 w-10">
+                            <AvatarImage src={profile.avatar} alt={profile.user.username} />
+                            <AvatarFallback>
+                              {profile.user.username.charAt(0).toUpperCase()}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <Link 
+                              to={`/forum/users/${profile.user._id}`}
+                              className="font-medium hover:underline"
+                            >
+                              {profile.user.username}
+                            </Link>
+                            {profile.title && (
+                              <Badge variant="secondary" className="ml-2 text-xs">
+                                {profile.title}
+                              </Badge>
+                            )}
+                            <div className="text-xs text-muted-foreground">
+                              {profile.title || (profile.reputation >= 1000 ? 'Senior Member' : 'Member')}
                             </div>
-                          </div>
-                        </TableCell>
-                        
-                        <TableCell className="text-center">
-                          <div className="flex items-center justify-center gap-1">
-                            <Star className="h-4 w-4 text-yellow-500" />
-                            <span className="font-medium">{profile.reputation}</span>
-                          </div>
-                        </TableCell>
-                        
-                        <TableCell className="text-center">
-                          <Badge variant="outline">{profile.postCount}</Badge>
-                        </TableCell>
-                        
-                        <TableCell className="text-center">
-                          <Badge variant="outline">{profile.topicCount}</Badge>
-                        </TableCell>
-                        
-                        <TableCell className="text-center">
-                          <span className="text-sm text-muted-foreground">
-                            {profile.lastSeen ? formatLastSeen(profile.lastSeen) : 'Never'}
-                          </span>
-                        </TableCell>
-                        
-                        <TableCell className="text-center">
-                          <div className="flex items-center justify-center gap-2">
-                            <Button variant="ghost" size="sm" asChild>
-                              <Link to={`/forum/profile/${profile.user._id}`}>
-                                <ExternalLink className="h-4 w-4" />
-                              </Link>
-                            </Button>
-                            
-                            {profile.githubProfile && (
-                              <Button variant="ghost" size="sm" asChild>
-                                <a 
-                                  href={profile.githubProfile} 
-                                  target="_blank" 
-                                  rel="noopener noreferrer"
-                                >
-                                  <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
-                                    <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
-                                  </svg>
-                                </a>
-                              </Button>
+                            {profile.location && (
+                              <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                                <MapPin className="h-3 w-3" />
+                                {profile.location}
+                              </div>
                             )}
                           </div>
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
-                </TableBody>
-              </Table>
-            </div>
+                        </div>
+                      </TableCell>
+                      
+                      <TableCell className="text-center">
+                        <div className="flex items-center justify-center gap-1">
+                          <Star className="h-4 w-4 text-yellow-500" />
+                          <span className="font-semibold">{profile.reputation}</span>
+                        </div>
+                      </TableCell>
+                      
+                      <TableCell className="text-center">
+                        <div className="flex items-center justify-center gap-1">
+                          <MessageSquare className="h-4 w-4 text-blue-500" />
+                          <span>{profile.postCount}</span>
+                        </div>
+                      </TableCell>
+                      
+                      <TableCell className="text-center">
+                        <div className="flex items-center justify-center gap-1">
+                          <FileText className="h-4 w-4 text-green-500" />
+                          <span>{profile.topicCount}</span>
+                        </div>
+                      </TableCell>
+                      
+                      <TableCell className="text-center text-sm text-muted-foreground">
+                        {formatLastSeen(profile.lastSeen)}
+                      </TableCell>
+                      
+                      <TableCell>
+                        <Link to={`/forum/users/${profile.user._id}`}>
+                          <Button variant="ghost" size="sm">
+                            <ExternalLink className="h-4 w-4" />
+                          </Button>
+                        </Link>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
           )}
         </CardContent>
       </Card>
@@ -326,19 +294,19 @@ export default function ForumLeaderboardPage() {
         <div className="flex justify-center gap-2">
           <Button
             variant="outline"
-            disabled={page <= 1}
+            disabled={page === 1}
             onClick={() => setPage(page - 1)}
           >
             Previous
           </Button>
           
-          <div className="flex items-center gap-1">
-            {Array.from({ length: Math.min(5, leaderboardData.pagination.pages) }).map((_, i) => {
+          <div className="flex items-center gap-2">
+            {Array.from({ length: Math.min(5, leaderboardData.pagination.pages) }, (_, i) => {
               const pageNum = i + 1;
               return (
                 <Button
                   key={pageNum}
-                  variant={page === pageNum ? "default" : "outline"}
+                  variant={pageNum === page ? "default" : "outline"}
                   size="sm"
                   onClick={() => setPage(pageNum)}
                 >
@@ -350,7 +318,7 @@ export default function ForumLeaderboardPage() {
           
           <Button
             variant="outline"
-            disabled={page >= leaderboardData.pagination.pages}
+            disabled={page === leaderboardData.pagination.pages}
             onClick={() => setPage(page + 1)}
           >
             Next

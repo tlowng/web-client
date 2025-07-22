@@ -1,4 +1,4 @@
-// src/pages/ForumStatsPage.tsx
+// src/pages/ForumStatsPage.tsx - FIXED VERSION  
 import { Link } from 'react-router-dom';
 import { useFetch } from '@/hooks/use-fetch';
 import { getForumStats } from '@/api';
@@ -94,72 +94,43 @@ export default function ForumStatsPage() {
         </div>
       </div>
 
+      {/* Content */}
       {loading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-          {Array.from({ length: 5 }).map((_, i) => (
-            <Card key={i}>
-              <CardContent className="p-4">
-                <Skeleton className="h-4 w-20 mb-2" />
-                <Skeleton className="h-8 w-16" />
-              </CardContent>
-            </Card>
-          ))}
+        <div className="space-y-6">
+          {/* Loading skeletons */}
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <Card key={i}>
+                <CardContent className="p-4">
+                  <div className="space-y-2">
+                    <Skeleton className="h-4 w-16" />
+                    <Skeleton className="h-8 w-12" />
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         </div>
       ) : stats ? (
         <>
           {/* Overview Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-            <Card className="hover:shadow-lg transition-shadow">
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+            <Card>
               <CardContent className="p-4">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 bg-blue-100 rounded-lg">
-                    <Users className="h-6 w-6 text-blue-600" />
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">Total Users</p>
-                    <p className="text-2xl font-bold">{formatNumber(stats.overview.users)}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="hover:shadow-lg transition-shadow">
-              <CardContent className="p-4">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-green-100 rounded-lg">
-                    <UserCheck className="h-6 w-6 text-green-600" />
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">Active Users</p>
-                    <p className="text-2xl font-bold">{formatNumber(stats.overview.activeUsers)}</p>
-                    <p className="text-xs text-green-600">
-                      {((stats.overview.activeUsers / stats.overview.users) * 100).toFixed(1)}% active
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="hover:shadow-lg transition-shadow">
-              <CardContent className="p-4">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-purple-100 rounded-lg">
-                    <Folder className="h-6 w-6 text-purple-600" />
-                  </div>
+                  <Folder className="h-8 w-8 text-blue-500" />
                   <div>
                     <p className="text-sm text-muted-foreground">Categories</p>
-                    <p className="text-2xl font-bold">{stats.overview.categories}</p>
+                    <p className="text-2xl font-bold">{formatNumber(stats.overview.categories)}</p>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="hover:shadow-lg transition-shadow">
+            <Card>
               <CardContent className="p-4">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 bg-orange-100 rounded-lg">
-                    <FileText className="h-6 w-6 text-orange-600" />
-                  </div>
+                  <FileText className="h-8 w-8 text-green-500" />
                   <div>
                     <p className="text-sm text-muted-foreground">Topics</p>
                     <p className="text-2xl font-bold">{formatNumber(stats.overview.topics)}</p>
@@ -168,12 +139,10 @@ export default function ForumStatsPage() {
               </CardContent>
             </Card>
 
-            <Card className="hover:shadow-lg transition-shadow">
+            <Card>
               <CardContent className="p-4">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 bg-indigo-100 rounded-lg">
-                    <MessageSquare className="h-6 w-6 text-indigo-600" />
-                  </div>
+                  <MessageSquare className="h-8 w-8 text-purple-500" />
                   <div>
                     <p className="text-sm text-muted-foreground">Posts</p>
                     <p className="text-2xl font-bold">{formatNumber(stats.overview.posts)}</p>
@@ -181,61 +150,78 @@ export default function ForumStatsPage() {
                 </div>
               </CardContent>
             </Card>
+
+            <Card>
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3">
+                  <Users className="h-8 w-8 text-orange-500" />
+                  <div>
+                    <p className="text-sm text-muted-foreground">Total Users</p>
+                    <p className="text-2xl font-bold">{formatNumber(stats.overview.users)}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3">
+                  <UserCheck className="h-8 w-8 text-red-500" />
+                  <div>
+                    <p className="text-sm text-muted-foreground">Active Users</p>
+                    <p className="text-2xl font-bold">{formatNumber(stats.overview.activeUsers)}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
 
-          {/* Secondary Metrics */}
+          {/* Additional Metrics */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Card>
-              <CardContent className="p-4">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-teal-100 rounded-lg">
-                    <TrendingUp className="h-6 w-6 text-teal-600" />
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">Engagement Rate</p>
-                    <p className="text-2xl font-bold">{calculateEngagementRate(stats)}</p>
-                    <p className="text-xs text-muted-foreground">posts per user</p>
-                  </div>
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <TrendingUp className="h-5 w-5" />
+                  Engagement Rate
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold text-green-600">
+                  {calculateEngagementRate(stats)}
                 </div>
+                <p className="text-sm text-muted-foreground">Posts + Topics per user</p>
               </CardContent>
             </Card>
 
             <Card>
-              <CardContent className="p-4">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-rose-100 rounded-lg">
-                    <Activity className="h-6 w-6 text-rose-600" />
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">Posts per Topic</p>
-                    <p className="text-2xl font-bold">
-                      {stats.overview.topics > 0 
-                        ? (stats.overview.posts / stats.overview.topics).toFixed(1)
-                        : '0'
-                      }
-                    </p>
-                    <p className="text-xs text-muted-foreground">avg discussion length</p>
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Activity className="h-5 w-5" />
+                  Activity Level
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center gap-2">
+                  <div className={`px-3 py-1 rounded-full text-sm font-medium ${getActivityLevel(stats.overview.posts + stats.overview.topics).bg} ${getActivityLevel(stats.overview.posts + stats.overview.topics).color}`}>
+                    {getActivityLevel(stats.overview.posts + stats.overview.topics).level}
                   </div>
                 </div>
+                <p className="text-sm text-muted-foreground mt-1">Based on total content</p>
               </CardContent>
             </Card>
 
             <Card>
-              <CardContent className="p-4">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-amber-100 rounded-lg">
-                    <Zap className="h-6 w-6 text-amber-600" />
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">Activity Level</p>
-                    <p className="text-2xl font-bold">
-                      {getActivityLevel(stats.overview.activeUsers).level}
-                    </p>
-                    <div className={`text-xs px-2 py-1 rounded inline-block ${getActivityLevel(stats.overview.activeUsers).bg} ${getActivityLevel(stats.overview.activeUsers).color}`}>
-                      {stats.overview.activeUsers} active users
-                    </div>
-                  </div>
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Zap className="h-5 w-5" />
+                  Community Health
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold text-blue-600">
+                  {stats.overview.users > 0 ? Math.round((stats.overview.activeUsers / stats.overview.users) * 100) : 0}%
                 </div>
+                <p className="text-sm text-muted-foreground">Active user ratio</p>
               </CardContent>
             </Card>
           </div>
@@ -311,7 +297,7 @@ export default function ForumStatsPage() {
                           
                           <TableCell className="text-center">
                             <Badge variant="outline">
-                              {topic.replyCount || topic.postCount || 0}
+                              {topic.replyCount || 0}
                             </Badge>
                           </TableCell>
                           
@@ -350,41 +336,35 @@ export default function ForumStatsPage() {
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {stats.topContributors.slice(0, 6).map((contributor, index) => (
-                    <Card key={contributor.user.username} className="hover:shadow-md transition-shadow">
+                    <Card key={index} className="border">
                       <CardContent className="p-4">
                         <div className="flex items-center gap-3">
-                          <div className="relative">
-                            <Avatar className="h-12 w-12">
-                              <AvatarImage 
-                                src={`https://github.com/${contributor.user.username}.png`}
-                                alt={contributor.user.username}
-                              />
-                              <AvatarFallback>
-                                {contributor.user.username.charAt(0).toUpperCase()}
-                              </AvatarFallback>
-                            </Avatar>
-                            {index < 3 && (
-                              <div className="absolute -top-2 -right-2 text-lg">
-                                {index === 0 ? '🥇' : index === 1 ? '🥈' : '🥉'}
-                              </div>
-                            )}
-                          </div>
+                          <Avatar className="h-12 w-12">
+                            <AvatarImage src={`https://github.com/${contributor.user.username}.png`} />
+                            <AvatarFallback>
+                              {contributor.user.username.charAt(0).toUpperCase()}
+                            </AvatarFallback>
+                          </Avatar>
                           
                           <div className="flex-1">
-                            <div className="font-medium">{contributor.user.username}</div>
-                            <div className="text-sm text-muted-foreground">
-                              Rank #{index + 1}
+                            <div className="flex items-center gap-2">
+                              <h4 className="font-medium">{contributor.user.username}</h4>
+                              <Badge variant="outline" className="text-xs">
+                                #{index + 1}
+                              </Badge>
                             </div>
                             
-                            <div className="flex items-center gap-4 mt-2 text-xs">
+                            <div className="grid grid-cols-3 gap-2 mt-2 text-xs">
                               <div className="flex items-center gap-1">
                                 <Star className="h-3 w-3 text-yellow-500" />
                                 <span>{contributor.reputation}</span>
                               </div>
+                              
                               <div className="flex items-center gap-1">
                                 <MessageSquare className="h-3 w-3 text-blue-500" />
                                 <span>{contributor.postCount}</span>
                               </div>
+                              
                               <div className="flex items-center gap-1">
                                 <FileText className="h-3 w-3 text-green-500" />
                                 <span>{contributor.topicCount}</span>

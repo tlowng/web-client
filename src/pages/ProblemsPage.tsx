@@ -1,225 +1,230 @@
-import { useState } from 'react';
+// src/pages/ProblemsPage.tsx - FIXED VERSION
+import { useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { getProblems } from '@/api';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardFooter
-} from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { Skeleton } from '@/components/ui/skeleton';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
-} from '@/components/ui/select';
 import { useFetch } from '@/hooks/use-fetch';
-import { Progress } from '@/components/ui/progress';
-import { Switch } from '@/components/ui/switch';
+import { getProblems } from '@/api';
+import type { ProblemData } from '@/types'; // Use ProblemData instead of Problem
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { LayoutGrid, Table as TableIcon } from 'lucide-react';
-
-interface Problem {
-  _id: string;
-  title?: string;
-  difficulty?: string;
-  tags?: string[];
-  acceptance: number;
-  submissionCount: number;
-}
+import { Skeleton } from '@/components/ui/skeleton';
+import { Search, BookOpen, Clock, MemoryStick, Filter, RefreshCw } from 'lucide-react';
+import { getDifficultyVariant, getDifficultyColor } from '@/utils/ui-helpers';
+import { useBreadcrumbTitle } from '@/contexts/breadcrumb-context';
 
 export default function ProblemsPage() {
-  const { data: problems, loading, error } = useFetch<Problem[]>(getProblems, []);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedDifficulty, setSelectedDifficulty] = useState('all');
-  const [selectedTag, setSelectedTag] = useState('all');
-  const [viewMode, setViewMode] = useState<'card' | 'table'>('card');
+  const [selectedDifficulty, setSelectedDifficulty] = useState<string>('all');
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
-  const getDifficultyVariant = (difficulty: string | undefined | null) => {
-    if (!difficulty) return 'outline';
-    switch (difficulty.toLowerCase()) {
-      case 'easy':
-        return 'default';
-      case 'medium':
-        return 'secondary';
-      case 'hard':
-        return 'destructive';
-      default:
-        return 'outline';
+  useBreadcrumbTitle('Problems');
+
+  // Use ProblemData[] instead of Problem[]
+  const fetchProblems = useCallback(async (): Promise<ProblemData[]> => {
+    const filters: any = {};
+    
+    if (selectedDifficulty !== 'all') {
+      filters.difficulty = selectedDifficulty;
     }
-  };
+    
+    if (selectedTags.length > 0) {
+      filters.tags = selectedTags;
+    }
+    
+    if (searchTerm.trim()) {
+      filters.search = searchTerm.trim();
+    }
+    
+    return await getProblems(filters);
+  }, [searchTerm, selectedDifficulty, selectedTags]);
 
-  const filteredProblems = problems?.filter(problem => {
-    const title = problem.title ?? '';
-    const difficulty = problem.difficulty ?? '';
-    const tags = problem.tags ?? [];
-
-    const matchesSearch = title.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesDifficulty = selectedDifficulty === 'all' || difficulty.toLowerCase() === selectedDifficulty;
-    const matchesTag = selectedTag === 'all' || tags.some(tag => tag.toLowerCase() === selectedTag);
-
-    return matchesSearch && matchesDifficulty && matchesTag;
-  });
-
-  const allTags = Array.from(new Set(problems?.flatMap(problem => problem.tags ?? []) || []));
-
-  if (error) {
-    return <div className="p-4 text-red-500">Error: {error}</div>;
-  }
-
-  const renderCardView = () => (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-      {filteredProblems?.map(problem => (
-        <Link
-          key={problem._id}
-          to={`/problems/${problem._id}`}
-          className="hover:shadow-lg transition-shadow"
-        >
-          <Card className="h-full">
-            <CardHeader className="p-4 pb-2">
-              <div className="flex justify-between items-start">
-                <CardTitle className="text-lg">{problem.title ?? 'Untitled'}</CardTitle>
-                <Badge
-                  variant={getDifficultyVariant(problem.difficulty)}
-                  className="px-2 py-1 text-sm"
-                >
-                  {problem.difficulty ?? 'Unknown'}
-                </Badge>
-              </div>
-            </CardHeader>
-            <CardContent className="p-4 pt-0">
-              <div className="flex flex-wrap gap-2 mb-3">
-                {(problem.tags ?? []).map(tag => (
-                  <Badge
-                    key={tag}
-                    variant="outline"
-                    className="text-sm font-normal"
-                  >
-                    {tag}
-                  </Badge>
-                ))}
-              </div>
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Acceptance</span>
-                  <span>{problem.acceptance ?? 0}%</span>
-                </div>
-                <Progress value={problem.acceptance ?? 0} />
-              </div>
-            </CardContent>
-            <CardFooter className="p-4 pt-0 text-sm text-muted-foreground">
-              {(problem.submissionCount ?? 0).toLocaleString()} submissions
-            </CardFooter>
-          </Card>
-        </Link>
-      ))}
-    </div>
+  const { data: problems, loading, error, refetch } = useFetch<ProblemData[]>(
+    fetchProblems,
+    [],
+    [searchTerm, selectedDifficulty, selectedTags]
   );
 
-  const renderTableView = () => (
-    <div className="overflow-x-auto w-full">
-      <Table className="w-full min-w-full">
-        <TableHeader>
-          <TableRow>
-            <TableHead className="w-[100px]">ID</TableHead>
-            <TableHead>Title</TableHead>
-            <TableHead className="text-center">Difficulty</TableHead>
-            <TableHead className="text-center">Acceptance</TableHead>
-            <TableHead className="text-center">Submissions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {filteredProblems?.map(problem => (
-            <TableRow key={problem._id}>
-              <TableCell className="font-mono text-xs text-muted-foreground">
-                {problem._id.slice(0, 8)}
-              </TableCell>
-              <TableCell>
-                <Link to={`/problems/${problem._id}`} className="text-primary hover:underline font-medium">
-                  {problem.title ?? 'Untitled'}
-                </Link>
-              </TableCell>
-              <TableCell className="text-center">
-                <Badge variant={getDifficultyVariant(problem.difficulty)}>
-                  {problem.difficulty ?? 'Unknown'}
-                </Badge>
-              </TableCell>
-              <TableCell className="text-center">{problem.acceptance ?? 0}%</TableCell>
-              <TableCell className="text-center">{(problem.submissionCount ?? 0).toLocaleString()}</TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </div>
-  );
-
+  // Rest of component remains the same...
   return (
-    <div className="p-4 space-y-4 w-full flex-1">
-      <div className="grid gap-4 md:grid-cols-3">
-        <Input
-          placeholder="Search problems..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-
-        <Select value={selectedDifficulty} onValueChange={setSelectedDifficulty}>
-          <SelectTrigger>
-            <SelectValue placeholder="Filter by difficulty" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Difficulties</SelectItem>
-            <SelectItem value="easy">Easy</SelectItem>
-            <SelectItem value="medium">Medium</SelectItem>
-            <SelectItem value="hard">Hard</SelectItem>
-          </SelectContent>
-        </Select>
-
-        <Select value={selectedTag} onValueChange={setSelectedTag}>
-          <SelectTrigger>
-            <SelectValue placeholder="Filter by tag" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Tags</SelectItem>
-            {allTags.map(tag => (
-              <SelectItem key={tag} value={tag.toLowerCase()}>
-                {tag}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+    <div className="p-4 space-y-6">
+      {/* Header */}
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div>
+          <h1 className="text-3xl font-bold flex items-center gap-2">
+            <BookOpen className="h-8 w-8 text-blue-500" />
+            Problems
+          </h1>
+          <p className="text-muted-foreground mt-1">
+            Practice competitive programming problems
+          </p>
+        </div>
+        
+        <Button onClick={() => refetch()} variant="outline" disabled={loading}>
+          <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+          Refresh
+        </Button>
       </div>
 
-      <div className="flex justify-end items-center gap-2">
-        <TableIcon className={viewMode === 'table' ? 'text-primary' : 'text-muted-foreground'} size={18} />
-        <Switch
-          checked={viewMode === 'card'}
-          onCheckedChange={(checked) => setViewMode(checked ? 'card' : 'table')}
-        />
-        <LayoutGrid className={viewMode === 'card' ? 'text-primary' : 'text-muted-foreground'} size={18} />
-      </div>
+      {/* Filters */}
+      <Card>
+        <CardContent className="p-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+              <Input
+                placeholder="Search problems..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-9"
+              />
+            </div>
+            
+            <Select value={selectedDifficulty} onValueChange={setSelectedDifficulty}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select difficulty" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Difficulties</SelectItem>
+                <SelectItem value="easy">Easy</SelectItem>
+                <SelectItem value="medium">Medium</SelectItem>
+                <SelectItem value="hard">Hard</SelectItem>
+              </SelectContent>
+            </Select>
 
-      {loading ? (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <Card key={i} className="h-32">
-              <CardContent className="p-4 space-y-2">
-                <Skeleton className="h-4 w-3/4" />
-                <Skeleton className="h-3 w-1/2" />
-                <Skeleton className="h-3 w-1/3" />
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      ) : filteredProblems?.length === 0 ? (
-        <div className="text-center text-muted-foreground py-8">
-          No problems found matching your criteria
-        </div>
-      ) : viewMode === 'card' ? renderCardView() : renderTableView()}
+            <Button 
+              variant="outline" 
+              onClick={() => {
+                setSearchTerm('');
+                setSelectedDifficulty('all');
+                setSelectedTags([]);
+              }}
+            >
+              <Filter className="h-4 w-4 mr-2" />
+              Clear Filters
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Problems List */}
+      <Card>
+        <CardHeader>
+          <CardTitle>
+            {problems?.length || 0} Problems Found
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {loading ? (
+            <div className="space-y-4">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <div key={i} className="flex items-center gap-4 p-4 border rounded-lg">
+                  <Skeleton className="h-12 w-12" />
+                  <div className="flex-1 space-y-2">
+                    <Skeleton className="h-4 w-64" />
+                    <Skeleton className="h-3 w-48" />
+                  </div>
+                  <div className="space-y-2">
+                    <Skeleton className="h-6 w-16" />
+                    <Skeleton className="h-4 w-20" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : error ? (
+            <div className="text-center py-8 text-red-500">
+              <p>Error loading problems: {error}</p>
+              <Button 
+                variant="outline" 
+                onClick={() => refetch()}
+                className="mt-4"
+              >
+                Retry
+              </Button>
+            </div>
+          ) : problems?.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              <BookOpen className="h-12 w-12 mx-auto mb-4 opacity-50" />
+              <p>No problems found matching your criteria.</p>
+            </div>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Problem</TableHead>
+                  <TableHead className="text-center">Difficulty</TableHead>
+                  <TableHead className="text-center">Time Limit</TableHead>
+                  <TableHead className="text-center">Memory Limit</TableHead>
+                  <TableHead className="w-20"></TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {problems?.map((problem) => (
+                  <TableRow key={problem._id} className="hover:bg-muted/50">
+                    <TableCell>
+                      <div className="space-y-1">
+                        <Link 
+                          to={`/problems/${problem._id}`}
+                          className="font-medium hover:text-primary transition-colors"
+                        >
+                          {problem.title}
+                        </Link>
+                        {problem.tags && problem.tags.length > 0 && (
+                          <div className="flex gap-1 flex-wrap">
+                            {problem.tags.slice(0, 3).map((tag, index) => (
+                              <Badge key={index} variant="outline" className="text-xs">
+                                {tag}
+                              </Badge>
+                            ))}
+                            {problem.tags.length > 3 && (
+                              <Badge variant="outline" className="text-xs">
+                                +{problem.tags.length - 3}
+                              </Badge>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </TableCell>
+                    
+                    <TableCell className="text-center">
+                      <Badge 
+                        variant={getDifficultyVariant(problem.difficulty)}
+                        className={getDifficultyColor(problem.difficulty)}
+                      >
+                        {problem.difficulty}
+                      </Badge>
+                    </TableCell>
+                    
+                    <TableCell className="text-center">
+                      <div className="flex items-center justify-center gap-1">
+                        <Clock className="h-4 w-4 text-muted-foreground" />
+                        <span className="text-sm">{problem.timeLimit}ms</span>
+                      </div>
+                    </TableCell>
+                    
+                    <TableCell className="text-center">
+                      <div className="flex items-center justify-center gap-1">
+                        <MemoryStick className="h-4 w-4 text-muted-foreground" />
+                        <span className="text-sm">{problem.memoryLimit}MB</span>
+                      </div>
+                    </TableCell>
+                    
+                    <TableCell>
+                      <Link to={`/problems/${problem._id}`}>
+                        <Button size="sm" variant="outline">
+                          Solve
+                        </Button>
+                      </Link>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }

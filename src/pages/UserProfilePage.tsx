@@ -1,4 +1,4 @@
-// src/pages/UserProfilePage.tsx
+// src/pages/UserProfilePage.tsx - FIXED VERSION
 import { useState, useCallback, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useFetch } from '@/hooks/use-fetch';
@@ -13,7 +13,6 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Separator } from '@/components/ui/separator';
-/*import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';*/
 import { 
   User, 
   MapPin, 
@@ -34,7 +33,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useBreadcrumbTitle } from '@/contexts/breadcrumb-context';
-import type { UserProfile, ForumProfile, UserWithProfile } from '@/api';
+import type { UserProfile, UserWithProfile } from '@/types';
 
 export default function UserProfilePage() {
   const { userId } = useParams<{ userId: string }>();
@@ -66,7 +65,7 @@ export default function UserProfilePage() {
     checkCurrentUser();
   }, []);
 
-  const fetchUserProfile = useCallback(async () => {
+  const fetchUserProfile = useCallback(async (): Promise<UserWithProfile> => {
     if (!userId) throw new Error('User ID is required');
     return await getForumProfile(userId);
   }, [userId]);
@@ -79,11 +78,11 @@ export default function UserProfilePage() {
 
   const isOwnProfile = currentUser && userProfile && currentUser._id === userProfile.user._id;
 
-  useBreadcrumbTitle(userProfile?.user?.username ? `${userProfile.user.username}'s Profile` : 'User Profile');
+  useBreadcrumbTitle(userProfile?.user?.username ? `Profile: ${userProfile.user.username}` : 'User Profile');
 
-  // Initialize form when profile loads
+  // Initialize form when user profile is loaded
   useEffect(() => {
-    if (userProfile?.profile) {
+    if (userProfile?.profile && isOwnProfile) {
       setProfileForm({
         signature: userProfile.profile.signature || '',
         title: userProfile.profile.title || '',
@@ -96,7 +95,7 @@ export default function UserProfilePage() {
         }
       });
     }
-  }, [userProfile]);
+  }, [userProfile, isOwnProfile]);
 
   const handleSaveProfile = async () => {
     if (!isOwnProfile) return;
@@ -104,9 +103,9 @@ export default function UserProfilePage() {
     setSaving(true);
     try {
       await updateMyForumProfile(profileForm);
-      toast.success('Profile updated successfully!');
       setEditMode(false);
-      await refetch(); // Refresh profile data
+      refetch();
+      toast.success('Profile updated successfully');
     } catch (error: any) {
       console.error('Failed to update profile:', error);
       toast.error(error.response?.data?.message || 'Failed to update profile');
@@ -115,9 +114,7 @@ export default function UserProfilePage() {
     }
   };
 
-  const cancelEdit = () => {
-    setEditMode(false);
-    // Reset form to original values
+  const handleCancel = () => {
     if (userProfile?.profile) {
       setProfileForm({
         signature: userProfile.profile.signature || '',
@@ -131,43 +128,51 @@ export default function UserProfilePage() {
         }
       });
     }
+    setEditMode(false);
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-  };
+  if (loading) {
+    return (
+      <div className="p-4 space-y-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-1">
+            <Card>
+              <CardContent className="p-6">
+                <div className="text-center space-y-4">
+                  <Skeleton className="h-24 w-24 rounded-full mx-auto" />
+                  <div className="space-y-2">
+                    <Skeleton className="h-6 w-32 mx-auto" />
+                    <Skeleton className="h-4 w-24 mx-auto" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+          <div className="lg:col-span-2 space-y-6">
+            <Card>
+              <CardContent className="p-6">
+                <div className="space-y-4">
+                  <Skeleton className="h-6 w-48" />
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-3/4" />
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
-  const getUserTitle = (profile: ForumProfile) => {
-    if (profile.title) return profile.title;
-    
-    // Auto-generate title based on reputation
-    if (profile.reputation >= 5000) return 'Forum Legend';
-    if (profile.reputation >= 2000) return 'Expert Contributor';
-    if (profile.reputation >= 1000) return 'Senior Member';
-    if (profile.reputation >= 500) return 'Active Member';
-    if (profile.reputation >= 100) return 'Regular Member';
-    return 'New Member';
-  };
-
-  const getActivityColor = (count: number) => {
-    if (count >= 100) return 'text-red-500';
-    if (count >= 50) return 'text-orange-500';
-    if (count >= 25) return 'text-yellow-500';
-    if (count >= 10) return 'text-green-500';
-    return 'text-gray-500';
-  };
-
-  if (error) {
+  if (error || !userProfile) {
     return (
       <div className="p-4">
         <Card>
           <CardContent className="p-6 text-center">
             <div className="text-red-500">
-              <p>Error loading profile: {error}</p>
+              <User className="h-12 w-12 mx-auto mb-4 opacity-50" />
+              <p>Error loading user profile: {error || 'User not found'}</p>
               <Button 
                 variant="outline" 
                 onClick={() => refetch()}
@@ -182,440 +187,359 @@ export default function UserProfilePage() {
     );
   }
 
-  if (loading) {
-    return (
-      <div className="p-4 space-y-6">
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center gap-6">
-              <Skeleton className="h-24 w-24 rounded-full" />
-              <div className="space-y-2 flex-1">
-                <Skeleton className="h-8 w-48" />
-                <Skeleton className="h-4 w-32" />
-                <Skeleton className="h-4 w-64" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {Array.from({ length: 3 }).map((_, i) => (
-            <Card key={i}>
-              <CardContent className="p-4">
-                <Skeleton className="h-6 w-16 mb-2" />
-                <Skeleton className="h-8 w-24" />
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </div>
-    );
-  }
-
-  if (!userProfile) {
-    return (
-      <div className="p-4">
-        <Card>
-          <CardContent className="p-6 text-center">
-            <User className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-            <p className="text-muted-foreground">User profile not found.</p>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
+  const { user, profile, recentActivity } = userProfile;
 
   return (
     <div className="p-4 space-y-6">
-      {/* Profile Header */}
-      <Card>
-        <CardContent className="p-6">
-          <div className="flex flex-col md:flex-row items-start gap-6">
-            <div className="flex items-center gap-4">
-              <Avatar className="h-24 w-24">
-                <AvatarImage 
-                  src={`https://github.com/${userProfile.user.username}.png`}
-                  alt={userProfile.user.username}
-                />
-                <AvatarFallback className="text-lg">
-                  {userProfile.user.username.charAt(0).toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
-              
-              <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <h1 className="text-2xl font-bold">{userProfile.user.username}</h1>
-                  {userProfile.user.role === 'admin' && (
-                    <Badge variant="destructive">Admin</Badge>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Profile Sidebar */}
+        <div className="lg:col-span-1 space-y-6">
+          {/* Basic Info Card */}
+          <Card>
+            <CardContent className="p-6">
+              <div className="text-center space-y-4">
+                <Avatar className="h-24 w-24 mx-auto">
+                  <AvatarImage src={profile.avatar} alt={user.username} />
+                  <AvatarFallback className="text-2xl">
+                    {user.username.charAt(0).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+                
+                <div>
+                  <h1 className="text-2xl font-bold">{user.username}</h1>
+                  {profile.title && (
+                    <Badge variant="secondary" className="mt-1">
+                      {profile.title}
+                    </Badge>
                   )}
-                  {userProfile.user.role === 'moderator' && (
-                    <Badge variant="secondary">Moderator</Badge>
-                  )}
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Member since {new Date(user.createdAt).toLocaleDateString()}
+                  </p>
                 </div>
-                
-                <p className="text-muted-foreground">{getUserTitle(userProfile.profile)}</p>
-                
-                {userProfile.profile.signature && (
-                  <p className="text-sm italic max-w-md">{userProfile.profile.signature}</p>
-                )}
-              </div>
-            </div>
-            
-            <div className="ml-auto flex items-center gap-2">
-              {isOwnProfile && (
-                <>
-                  {editMode ? (
-                    <>
-                      <Button 
-                        onClick={handleSaveProfile} 
-                        disabled={saving}
-                        size="sm"
-                      >
-                        <Save className="h-4 w-4 mr-2" />
-                        {saving ? 'Saving...' : 'Save'}
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        onClick={cancelEdit}
-                        size="sm"
-                      >
+
+                {isOwnProfile && (
+                  <Button
+                    variant={editMode ? "outline" : "default"}
+                    size="sm"
+                    onClick={() => setEditMode(!editMode)}
+                    className="w-full"
+                  >
+                    {editMode ? (
+                      <>
                         <X className="h-4 w-4 mr-2" />
                         Cancel
-                      </Button>
-                    </>
-                  ) : (
-                    <Button 
-                      onClick={() => setEditMode(true)}
-                      size="sm"
-                    >
-                      <Edit3 className="h-4 w-4 mr-2" />
-                      Edit Profile
-                    </Button>
-                  )}
-                </>
-              )}
-            </div>
-          </div>
-          
-          {/* Profile Info */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
-            <div className="space-y-2">
-              {userProfile.profile.location && (
-                <div className="flex items-center gap-2 text-sm">
-                  <MapPin className="h-4 w-4 text-muted-foreground" />
-                  <span>{userProfile.profile.location}</span>
-                </div>
-              )}
-              
-              {userProfile.profile.website && (
-                <div className="flex items-center gap-2 text-sm">
-                  <Globe className="h-4 w-4 text-muted-foreground" />
-                  <a 
-                    href={userProfile.profile.website}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-primary hover:underline"
-                  >
-                    {userProfile.profile.website}
-                    <ExternalLink className="h-3 w-3 inline ml-1" />
-                  </a>
-                </div>
-              )}
-              
-              {userProfile.profile.githubProfile && (
-                <div className="flex items-center gap-2 text-sm">
-                  <Github className="h-4 w-4 text-muted-foreground" />
-                  <a 
-                    href={userProfile.profile.githubProfile}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-primary hover:underline"
-                  >
-                    GitHub Profile
-                    <ExternalLink className="h-3 w-3 inline ml-1" />
-                  </a>
-                </div>
-              )}
-            </div>
-            
-            <div className="space-y-2">
-              <div className="flex items-center gap-2 text-sm">
-                <Calendar className="h-4 w-4 text-muted-foreground" />
-                <span>Joined {formatDate(userProfile.user.createdAt)}</span>
+                      </>
+                    ) : (
+                      <>
+                        <Edit3 className="h-4 w-4 mr-2" />
+                        Edit Profile
+                      </>
+                    )}
+                  </Button>
+                )}
               </div>
-              
-              {userProfile.profile.lastSeen && (
-                <div className="flex items-center gap-2 text-sm">
-                  <Clock className="h-4 w-4 text-muted-foreground" />
-                  <span>Last seen {formatDate(userProfile.profile.lastSeen)}</span>
-                </div>
-              )}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Edit Form (if in edit mode) */}
-      {editMode && isOwnProfile && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Settings className="h-5 w-5" />
-              Edit Profile
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="title">Title</Label>
-                <Input
-                  id="title"
-                  placeholder="Your custom title"
-                  value={profileForm.title}
-                  onChange={(e) => setProfileForm(prev => ({ ...prev, title: e.target.value }))}
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="location">Location</Label>
-                <Input
-                  id="location"
-                  placeholder="Your location"
-                  value={profileForm.location}
-                  onChange={(e) => setProfileForm(prev => ({ ...prev, location: e.target.value }))}
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="website">Website</Label>
-                <Input
-                  id="website"
-                  placeholder="https://your-website.com"
-                  value={profileForm.website}
-                  onChange={(e) => setProfileForm(prev => ({ ...prev, website: e.target.value }))}
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="github">GitHub Profile</Label>
-                <Input
-                  id="github"
-                  placeholder="https://github.com/username"
-                  value={profileForm.githubProfile}
-                  onChange={(e) => setProfileForm(prev => ({ ...prev, githubProfile: e.target.value }))}
-                />
-              </div>
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="signature">Signature</Label>
-              <Textarea
-                id="signature"
-                placeholder="Your signature or quote"
-                value={profileForm.signature}
-                onChange={(e) => setProfileForm(prev => ({ ...prev, signature: e.target.value }))}
-                className="resize-none"
-                rows={3}
-              />
-            </div>
-            
-            <Separator />
-            
-            <div className="space-y-4">
-              <h3 className="font-semibold">Preferences</h3>
-              
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label>Email Notifications</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Receive email notifications for forum activities
-                  </p>
-                </div>
-                <Switch
-                  checked={profileForm.preferences.emailNotifications}
-                  onCheckedChange={(checked) => 
-                    setProfileForm(prev => ({
-                      ...prev,
-                      preferences: { ...prev.preferences, emailNotifications: checked }
-                    }))
-                  }
-                />
-              </div>
-              
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label>Show Online Status</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Allow others to see when you're online
-                  </p>
-                </div>
-                <Switch
-                  checked={profileForm.preferences.showOnlineStatus}
-                  onCheckedChange={(checked) => 
-                    setProfileForm(prev => ({
-                      ...prev,
-                      preferences: { ...prev.preferences, showOnlineStatus: checked }
-                    }))
-                  }
-                />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-yellow-100 rounded-lg">
-                <Star className="h-5 w-5 text-yellow-600" />
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Reputation</p>
-                <p className="text-2xl font-bold">{userProfile.profile.reputation}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <MessageSquare className="h-5 w-5 text-blue-600" />
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Posts</p>
-                <p className={`text-2xl font-bold ${getActivityColor(userProfile.profile.postCount)}`}>
-                  {userProfile.profile.postCount}
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-green-100 rounded-lg">
-                <FileText className="h-5 w-5 text-green-600" />
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Topics</p>
-                <p className={`text-2xl font-bold ${getActivityColor(userProfile.profile.topicCount)}`}>
-                  {userProfile.profile.topicCount}
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-purple-100 rounded-lg">
-                <Activity className="h-5 w-5 text-purple-600" />
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Activity Score</p>
-                <p className="text-2xl font-bold">
-                  {Math.round((userProfile.profile.postCount + userProfile.profile.topicCount * 2) / 10) || 1}
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Recent Activity */}
-      {userProfile.recentActivity && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Recent Topics */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <FileText className="h-5 w-5" />
-                Recent Topics
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {userProfile.recentActivity.topics.length === 0 ? (
-                <p className="text-muted-foreground text-center py-4">No recent topics.</p>
-              ) : (
-                <div className="space-y-3">
-                  {userProfile.recentActivity.topics.slice(0, 5).map((topic) => (
-                    <div key={topic._id} className="flex items-center justify-between">
-                      <div className="flex-1">
-                        <Link 
-                          to={`/forum/topic/${topic.slug}`}
-                          className="font-medium hover:text-primary transition-colors text-sm"
-                        >
-                          {topic.title}
-                        </Link>
-                        <div className="flex items-center gap-2 mt-1">
-                          <span className="text-xs text-muted-foreground">
-                            {new Date(topic.createdAt).toLocaleDateString()}
-                          </span>
-                          <div className="flex items-center gap-1">
-                            <Eye className="h-3 w-3" />
-                            <span className="text-xs">{topic.viewCount}</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
             </CardContent>
           </Card>
 
-          {/* Recent Posts */}
+          {/* Stats Card */}
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <MessageSquare className="h-5 w-5" />
-                Recent Posts
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Activity className="h-5 w-5" />
+                Forum Stats
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              {userProfile.recentActivity.posts.length === 0 ? (
-                <p className="text-muted-foreground text-center py-4">No recent posts.</p>
-              ) : (
-                <div className="space-y-3">
-                  {userProfile.recentActivity.posts.slice(0, 5).map((post) => (
-                    <div key={post._id} className="space-y-2">
-                      <div className="text-sm text-muted-foreground">
-                        Replied in: <Link 
-                          to={`/forum/topic/${post.topic}`} 
-                          className="text-primary hover:underline"
-                        >
-                          Topic
-                        </Link>
-                      </div>
-                      <div className="text-sm line-clamp-2">
-                        {post.content.replace(/<[^>]*>/g, '').substring(0, 100)}...
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs text-muted-foreground">
-                          {new Date(post.createdAt).toLocaleDateString()}
-                        </span>
-                        {post.likeCount > 0 && (
-                          <div className="flex items-center gap-1">
-                            <Star className="h-3 w-3 text-yellow-500" />
-                            <span className="text-xs">{post.likeCount}</span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  ))}
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="text-center">
+                  <div className="flex items-center justify-center gap-1 text-yellow-500">
+                    <Star className="h-4 w-4" />
+                    <span className="font-bold text-lg">{profile.reputation}</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground">Reputation</p>
+                </div>
+                <div className="text-center">
+                  <div className="flex items-center justify-center gap-1 text-blue-500">
+                    <MessageSquare className="h-4 w-4" />
+                    <span className="font-bold text-lg">{profile.postCount}</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground">Posts</p>
+                </div>
+                <div className="text-center">
+                  <div className="flex items-center justify-center gap-1 text-green-500">
+                    <FileText className="h-4 w-4" />
+                    <span className="font-bold text-lg">{profile.topicCount}</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground">Topics</p>
+                </div>
+                <div className="text-center">
+                  <div className="flex items-center justify-center gap-1 text-gray-500">
+                    <Clock className="h-4 w-4" />
+                    <span className="text-xs">{new Date(profile.lastSeen).toLocaleDateString()}</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground">Last seen</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Contact Info */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg flex items-center gap-2">
+                <User className="h-5 w-5" />
+                Contact
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {profile.location && (
+                <div className="flex items-center gap-2 text-sm">
+                  <MapPin className="h-4 w-4 text-muted-foreground" />
+                  <span>{profile.location}</span>
+                </div>
+              )}
+              {profile.website && (
+                <div className="flex items-center gap-2 text-sm">
+                  <Globe className="h-4 w-4 text-muted-foreground" />
+                  <a 
+                    href={profile.website} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-blue-500 hover:underline flex items-center gap-1"
+                  >
+                    Website
+                    <ExternalLink className="h-3 w-3" />
+                  </a>
+                </div>
+              )}
+              {profile.githubProfile && (
+                <div className="flex items-center gap-2 text-sm">
+                  <Github className="h-4 w-4 text-muted-foreground" />
+                  <a 
+                    href={`https://github.com/${profile.githubProfile}`} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-blue-500 hover:underline flex items-center gap-1"
+                  >
+                    @{profile.githubProfile}
+                    <ExternalLink className="h-3 w-3" />
+                  </a>
                 </div>
               )}
             </CardContent>
           </Card>
         </div>
-      )}
+
+        {/* Main Content */}
+        <div className="lg:col-span-2 space-y-6">
+          {/* Profile Edit Form */}
+          {editMode && isOwnProfile && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Settings className="h-5 w-5" />
+                  Edit Profile
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="title">Title</Label>
+                    <Input
+                      id="title"
+                      value={profileForm.title}
+                      onChange={(e) => setProfileForm(prev => ({ ...prev, title: e.target.value }))}
+                      placeholder="Your title..."
+                      maxLength={50}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="location">Location</Label>
+                    <Input
+                      id="location"
+                      value={profileForm.location}
+                      onChange={(e) => setProfileForm(prev => ({ ...prev, location: e.target.value }))}
+                      placeholder="Your location..."
+                      maxLength={100}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <Label htmlFor="signature">Signature</Label>
+                  <Textarea
+                    id="signature"
+                    value={profileForm.signature}
+                    onChange={(e) => setProfileForm(prev => ({ ...prev, signature: e.target.value }))}
+                    placeholder="Your signature..."
+                    maxLength={500}
+                    rows={3}
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="website">Website</Label>
+                    <Input
+                      id="website"
+                      value={profileForm.website}
+                      onChange={(e) => setProfileForm(prev => ({ ...prev, website: e.target.value }))}
+                      placeholder="https://..."
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="github">GitHub Username</Label>
+                    <Input
+                      id="github"
+                      value={profileForm.githubProfile}
+                      onChange={(e) => setProfileForm(prev => ({ ...prev, githubProfile: e.target.value }))}
+                      placeholder="username"
+                    />
+                  </div>
+                </div>
+
+                <Separator />
+
+                <div className="space-y-4">
+                  <h4 className="font-medium">Preferences</h4>
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="email-notifications">Email Notifications</Label>
+                      <Switch
+                        id="email-notifications"
+                        checked={profileForm.preferences.emailNotifications}
+                        onCheckedChange={(checked) => 
+                          setProfileForm(prev => ({
+                            ...prev,
+                            preferences: { ...prev.preferences, emailNotifications: checked }
+                          }))
+                        }
+                      />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="show-online">Show Online Status</Label>
+                      <Switch
+                        id="show-online"
+                        checked={profileForm.preferences.showOnlineStatus}
+                        onCheckedChange={(checked) => 
+                          setProfileForm(prev => ({
+                            ...prev,
+                            preferences: { ...prev.preferences, showOnlineStatus: checked }
+                          }))
+                        }
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex gap-2 pt-4">
+                  <Button
+                    onClick={handleSaveProfile}
+                    disabled={saving}
+                    className="flex-1"
+                  >
+                    {saving ? (
+                      <>Saving...</>
+                    ) : (
+                      <>
+                        <Save className="h-4 w-4 mr-2" />
+                        Save Changes
+                      </>
+                    )}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={handleCancel}
+                    disabled={saving}
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Signature */}
+          {profile.signature && !editMode && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">About</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm whitespace-pre-wrap">{profile.signature}</p>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Recent Activity */}
+          {recentActivity && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Activity className="h-5 w-5" />
+                  Recent Activity
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {recentActivity.topics.length > 0 && (
+                  <div>
+                    <h4 className="font-medium mb-2 flex items-center gap-2">
+                      <FileText className="h-4 w-4" />
+                      Recent Topics
+                    </h4>
+                    <div className="space-y-2">
+                      {recentActivity.topics.map((topic) => (
+                        <div key={topic._id} className="border-l-2 border-blue-500 pl-3">
+                          <Link 
+                            to={`/forum/topics/${topic.slug}`}
+                            className="font-medium hover:underline text-sm"
+                          >
+                            {topic.title}
+                          </Link>
+                          <p className="text-xs text-muted-foreground">
+                            {new Date(topic.createdAt).toLocaleDateString()}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {recentActivity.posts.length > 0 && (
+                  <div>
+                    <h4 className="font-medium mb-2 flex items-center gap-2">
+                      <MessageSquare className="h-4 w-4" />
+                      Recent Posts
+                    </h4>
+                    <div className="space-y-2">
+                      {recentActivity.posts.slice(0, 5).map((post) => (
+                        <div key={post._id} className="border-l-2 border-green-500 pl-3">
+                          <Link 
+                            to={`/forum/topics/${post.topic}`}
+                            className="font-medium hover:underline text-sm"
+                          >
+                            Re: {post.topic}
+                          </Link>
+                          <p className="text-xs text-muted-foreground">
+                            {new Date(post.createdAt).toLocaleDateString()}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {(!recentActivity.topics.length && !recentActivity.posts.length) && (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <Activity className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                    <p>No recent activity</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
