@@ -11,8 +11,8 @@ import { AppSidebar } from "@/components/app-sidebar";
 import { DynamicBreadcrumb } from "@/components/dynamic-breadcrumb";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { AdminPanel } from '@/components/admin/admin-panel';
-import  AdminContestsPage  from '@/pages/AdminContestsPage';
-import CreateContestPage from '@/pages/CreateContestPage';
+/*import  AdminContestsPage  from '@/pages/AdminContestsPage';
+import CreateContestPage from '@/pages/CreateContestPage';*/
 // Contexts
 import { BreadcrumbProvider } from "@/contexts/breadcrumb-context";
 
@@ -87,8 +87,8 @@ export default function App() {
                   {/* Admin Routes */}
                   <Route path="/admin" element={<AdminPanel />} />
                   <Route path="/admin/problems" element={<AdminProblemsPage/>} />
-                  <Route path="/admin/contests" element={<AdminContestsPage/>} />
-                  <Route path="/admin/contests/create" element={<CreateContestPage/>} />
+                  {/*<Route path="/admin/contests" element={<AdminContestsPage/>} />
+                  <Route path="/admin/contests/create" element={<CreateContestPage/>} />*/}
                 </Routes>
               </div>
             </SidebarInset>
