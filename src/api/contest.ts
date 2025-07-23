@@ -7,7 +7,8 @@ import type {
   ContestSubmission,
   ContestSubmissionData,
   Standings,
-  ApiResponse 
+  ApiResponse,
+  PaginationInfo
 } from '@/types';
 
 // Get all contests with filters
@@ -21,12 +22,7 @@ export const getContests = async (params?: {
     success: boolean;
     data: {
       contests: Contest[];
-      pagination: {
-        page: number;
-        limit: number;
-        total: number;
-        pages: number;
-      };
+      pagination: PaginationInfo;
     };
   }>('/contests', { params });
   return response.data.data;
@@ -56,17 +52,17 @@ export const registerForContest = async (data: ContestRegistrationData) => {
 
 // Submit solution to contest problem
 export const submitToContest = async (data: ContestSubmissionData) => {
-  const { contestId, ...submissionData } = data;
+  const { contestId, problemId, ...submissionData } = data;
   const response = await api.post<ApiResponse<{ submissionId: string }>>(
     `/contests/${contestId}/submit`,
     {
-      problemLabel: submissionData.problemId, // Backend expects problemLabel (A, B, C...)
-      code: submissionData.code,
-      language: submissionData.language
+      problemLabel: problemId, // problemId is the label (A, B, C...)
+      ...submissionData
     }
   );
   return response.data;
 };
+
 
 // Get contest standings
 export const getContestStandings = async (

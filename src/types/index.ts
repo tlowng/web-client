@@ -121,14 +121,14 @@ export interface RegisterCredentials {
 }
 
 // ==================== CONTEST TYPES ====================
-export interface ContestProblem {
-  problem: string; // ObjectId
-  label: string; // A, B, C...
+export interface PopulatedContestProblem {
+  problem: ProblemData;
+  label: string;
   points: number;
 }
 
 export interface ContestParticipant {
-  user: string; // ObjectId
+  user: UserProfile; // Changed from string to UserProfile
   registeredAt: string;
 }
 
@@ -147,7 +147,7 @@ export interface Contest {
   startTime: string;
   endTime: string;
   duration: number; // minutes
-  problems: ContestProblem[];
+  problems: PopulatedContestProblem[];
   participants: ContestParticipant[];
   type: ContestType;
   scoringSystem: ScoringSystem;
@@ -156,17 +156,19 @@ export interface Contest {
   freezeTime: number;
   isVisible: boolean;
   isRated: boolean;
-  createdBy: string; // ObjectId
+  createdBy: UserProfile; // Changed from string to UserProfile
   settings: ContestSettings;
   registrationDeadline: string;
   password?: string;
   isPublished: boolean;
   totalSubmissions: number;
-  // Virtual fields
+  // Virtual fields from API
   status: ContestStatus;
   timeLeft: number;
   canRegister: boolean;
   participantCount: number;
+  isRegistered?: boolean; // Added optional field
+  isCreator?: boolean;   // Added optional field
   createdAt: string;
   updatedAt: string;
 }
@@ -203,7 +205,7 @@ export interface ContestSubmission {
   user: string; // ObjectId
   problem: string; // ObjectId
   problemLabel: string;
-  submission: string; // ObjectId - references regular Submission
+  submission: SubmissionResult; // Populated submission
   submissionTime: number; // minutes from contest start
   points: number;
   penalty: number;
@@ -215,7 +217,7 @@ export interface ContestSubmission {
 
 export interface ContestSubmissionData {
   contestId: string;
-  problemId: string;
+  problemId: string; // Problem Label A,B,C...
   code: string;
   language: string;
 }

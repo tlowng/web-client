@@ -121,7 +121,7 @@ export default function ContestsPage() {
           
           {/* Admin: Create Contest Button */}
           <Button asChild>
-            <Link to="/contests/create">
+            <Link to="/admin/contests/create">
               <Plus className="h-4 w-4 mr-2" />
               Create Contest
             </Link>

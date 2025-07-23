@@ -1,9 +1,9 @@
 // src/pages/ContestDashboardPage.tsx
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useFetch } from '@/hooks/use-fetch';
 import { getContestById, submitToContest, getMyContestSubmissions } from '@/api';
-import type { Contest, ContestSubmission } from '@/types';
+import type { Contest, ContestSubmission, PopulatedContestProblem } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -14,17 +14,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import MonacoEditor from '@monaco-editor/react';
 import { 
   Trophy, 
-  Clock, 
-  Code,
   Send,
   CheckCircle,
   XCircle,
   AlertCircle,
-  Timer,
-  FileText
+  Timer
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useBreadcrumbTitle } from '@/contexts/breadcrumb-context';
+import { getDifficultyVariant } from '@/utils/ui-helpers';
 
 const DEFAULT_CODE = {
   cpp: `#include <iostream>
@@ -45,7 +43,7 @@ int main() {
 
 export default function ContestDashboardPage() {
   const { id } = useParams<{ id: string }>();
-  const [selectedProblem, setSelectedProblem] = useState<string>('');
+  const [selectedProblem, setSelectedProblem] = useState<PopulatedContestProblem | null>(null);
   const [selectedLanguage, setSelectedLanguage] = useState('cpp');
   const [code, setCode] = useState(DEFAULT_CODE[selectedLanguage as keyof typeof DEFAULT_CODE]);
   const [submitting, setSubmitting] = useState(false);
@@ -75,17 +73,25 @@ export default function ContestDashboardPage() {
     refetch: refetchSubmissions 
   } = useFetch<ContestSubmission[]>(
     fetchMySubmissions,
-    [],
+    null,
     [id]
   );
 
+  const submissionsByProblem = useMemo(() => {
+    if (!submissions) return {};
+    return submissions.reduce((acc, sub) => {
+      acc[sub.problemLabel] = sub;
+      return acc;
+    }, {} as Record<string, ContestSubmission>);
+  }, [submissions]);
+  
   // Update breadcrumb with contest title
   useBreadcrumbTitle(contest?.title ? `${contest.title} - Dashboard` : 'Contest Dashboard');
 
   // Set default selected problem
   useEffect(() => {
-    if (contest?.problems.length && !selectedProblem) {
-      setSelectedProblem(contest.problems[0].label);
+    if (contest?.problems?.length && !selectedProblem) {
+      setSelectedProblem(contest.problems[0]);
     }
   }, [contest, selectedProblem]);
 
@@ -93,21 +99,19 @@ export default function ContestDashboardPage() {
   useEffect(() => {
     if (!contest || contest.status !== 'running') return;
 
+    setTimeLeft(contest.timeLeft);
+
     const timer = setInterval(() => {
-      const now = new Date().getTime();
-      const end = new Date(contest.endTime).getTime();
-      const remaining = Math.max(0, end - now);
+      setTimeLeft(prev => Math.max(0, prev - 1000));
       
-      setTimeLeft(remaining);
-      
-      if (remaining === 0) {
+      if (timeLeft <= 0) {
         toast.error('Contest has ended!');
         clearInterval(timer);
       }
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [contest]);
+  }, [contest, timeLeft]);
 
   const handleLanguageChange = (language: string) => {
     setSelectedLanguage(language);
@@ -124,13 +128,13 @@ export default function ContestDashboardPage() {
     try {
       await submitToContest({
         contestId: id,
-        problemId: selectedProblem, // This is the label (A, B, C...)
+        problemId: selectedProblem.label,
         code,
         language: selectedLanguage
       });
       
-      toast.success(`Solution submitted for Problem ${selectedProblem}!`);
-      refetchSubmissions();
+      toast.success(`Solution submitted for Problem ${selectedProblem.label}!`);
+      setTimeout(() => refetchSubmissions(), 1000); // give time for BE to process
     } catch (error: any) {
       console.error('Submission error:', error);
       toast.error(error.response?.data?.message || 'Failed to submit solution');
@@ -207,9 +211,7 @@ export default function ContestDashboardPage() {
       </div>
     );
   }
-
-  const selectedProblemData = contest.problems.find(p => p.label === selectedProblem);
-
+  
   return (
     <div className="p-4 space-y-4">
       {/* Header with Timer */}
@@ -239,15 +241,15 @@ export default function ContestDashboardPage() {
             <CardContent>
               <div className="space-y-2">
                 {contest.problems.map((problem) => {
-                  const submission = submissions.find(s => s.problemLabel === problem.label);
-                  const isSelected = selectedProblem === problem.label;
+                  const submission = submissionsByProblem[problem.label];
+                  const isSelected = selectedProblem?.label === problem.label;
                   
                   return (
                     <Button
                       key={problem.label}
                       variant={isSelected ? 'default' : 'outline'}
                       className="w-full justify-start"
-                      onClick={() => setSelectedProblem(problem.label)}
+                      onClick={() => setSelectedProblem(problem)}
                     >
                       <div className="flex items-center justify-between w-full">
                         <div className="flex items-center gap-2">
@@ -279,7 +281,7 @@ export default function ContestDashboardPage() {
             <CardContent>
               {submissionsLoading ? (
                 <Skeleton className="h-20" />
-              ) : submissions.length === 0 ? (
+              ) : !submissions || submissions.length === 0 ? (
                 <p className="text-sm text-muted-foreground text-center py-4">
                   No submissions yet
                 </p>
@@ -291,7 +293,7 @@ export default function ContestDashboardPage() {
                       className="flex items-center justify-between p-2 rounded border text-sm"
                     >
                       <div className="flex items-center gap-2">
-                        {getStatusIcon(submission.submission)}
+                        {getStatusIcon(submission.submission.status)}
                         <span className="font-mono">{submission.problemLabel}</span>
                       </div>
                       <div className="text-right">
@@ -316,41 +318,42 @@ export default function ContestDashboardPage() {
             </TabsList>
             
             <TabsContent value="problem" className="mt-4">
-              {selectedProblemData && (
+              {selectedProblem && (
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center justify-between">
                       <span>
-                        Problem {selectedProblemData.label}: {selectedProblemData.problem.title}
+                        Problem {selectedProblem.label}: {selectedProblem.problem.title}
                       </span>
-                      <Badge>{selectedProblemData.points} points</Badge>
+                      <Badge>{selectedProblem.points} points</Badge>
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="prose max-w-none">
+                    <div className="prose max-w-none dark:prose-invert">
                       <div className="mb-4 flex items-center gap-4 text-sm">
-                        <Badge variant="outline">
-                          {selectedProblemData.problem.difficulty}
+                        <Badge variant={getDifficultyVariant(selectedProblem.problem.difficulty)}>
+                          {selectedProblem.problem.difficulty}
                         </Badge>
                         <span className="text-muted-foreground">
-                          Time Limit: {selectedProblemData.problem.timeLimit}ms
+                          Time Limit: {selectedProblem.problem.timeLimit}ms
                         </span>
                         <span className="text-muted-foreground">
-                          Memory Limit: {selectedProblemData.problem.memoryLimit}MB
+                          Memory Limit: {selectedProblem.problem.memoryLimit}MB
                         </span>
                       </div>
                       
                       <div className="mt-6">
                         <h3 className="text-lg font-semibold mb-2">Problem Description</h3>
-                        <div className="whitespace-pre-wrap">
-                          {selectedProblemData.problem.description}
-                        </div>
+                        <div 
+                          className="whitespace-pre-wrap"
+                          dangerouslySetInnerHTML={{ __html: selectedProblem.problem.description }}
+                        />
                       </div>
 
-                      {selectedProblemData.problem.testCases?.length > 0 && (
+                      {selectedProblem.problem.testCases?.length > 0 && (
                         <div className="mt-6">
                           <h3 className="text-lg font-semibold mb-2">Sample Test Cases</h3>
-                          {selectedProblemData.problem.testCases.map((testCase, index) => (
+                          {selectedProblem.problem.testCases.map((testCase, index) => (
                             <div key={index} className="mt-4 border rounded-lg p-4">
                               <h4 className="font-medium mb-2">Example {index + 1}</h4>
                               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -389,7 +392,7 @@ export default function ContestDashboardPage() {
                         </SelectTrigger>
                         <SelectContent>
                           {contest.allowedLanguages.map(lang => (
-                            <SelectItem key={lang} value={lang}>{lang}</SelectItem>
+                            <SelectItem key={lang} value={lang}>{lang.charAt(0).toUpperCase() + lang.slice(1)}</SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
