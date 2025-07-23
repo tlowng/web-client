@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+// src/pages/SubmissionDetailPage.tsx - FINALIZED VERSION
+import { useEffect, useState, useRef } from 'react';
+import { useParams, Link } from 'react-router-dom';
 import { getSubmissionById } from '@/api';
 import {
   Card,
@@ -11,16 +12,20 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
+import { Button } from '@/components/ui/button';
+import { AlertCircle, ArrowLeft } from 'lucide-react';
 
-import type { SubmissionResult } from '@/api';
+import type { FullyPopulatedSubmissionResult } from '@/types';
 
 const STATUS_POLLING_INTERVAL = 3000; 
 
 export default function SubmissionDetailPage() {
   const { id } = useParams<{ id: string }>();
-  const [submission, setSubmission] = useState<SubmissionResult | null>(null);
+  const [submission, setSubmission] = useState<FullyPopulatedSubmissionResult | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     if (!id) {
@@ -29,29 +34,42 @@ export default function SubmissionDetailPage() {
       return;
     }
 
-    let intervalId: NodeJS.Timeout;
-
     const fetchSubmission = async () => {
       try {
         const response = await getSubmissionById(id);
         setSubmission(response);
 
         if (!['In Queue', 'Judging', 'Pending'].includes(response.status)) {
-          clearInterval(intervalId);
+          if (intervalRef.current) {
+            clearInterval(intervalRef.current);
+            intervalRef.current = null;
+          }
         }
       } catch (err) {
         setError('Failed to fetch submission details.');
         console.error(err);
-        clearInterval(intervalId); 
+        if (intervalRef.current) {
+          clearInterval(intervalRef.current);
+          intervalRef.current = null;
+        }
       } finally {
         setLoading(false);
       }
     };
 
     fetchSubmission(); 
-    intervalId = setInterval(fetchSubmission, STATUS_POLLING_INTERVAL);
+    
+    // Only set interval if it's not already running
+    if (!intervalRef.current) {
+        intervalRef.current = setInterval(fetchSubmission, STATUS_POLLING_INTERVAL);
+    }
 
-    return () => clearInterval(intervalId);
+    // Cleanup function to clear interval on component unmount
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+    };
   }, [id]);
 
   const getStatusVariant = (status: string) => {
@@ -72,23 +90,44 @@ export default function SubmissionDetailPage() {
     }
   };
 
-  if (error) {
-    return <div className="p-4 text-red-500">Error: {error}</div>;
-  }
-
   if (loading) {
     return (
       <div className="p-4 space-y-4">
         <Skeleton className="h-12 w-1/2" />
         <Skeleton className="h-4 w-1/4" />
-        <Skeleton className="h-4 w-full" />
         <Skeleton className="h-64 w-full" />
+        <Skeleton className="h-24 w-full" />
+      </div>
+    );
+  }
+  
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center h-64">
+        <AlertCircle className="h-12 w-12 text-red-500 mb-4" />
+        <p className="text-red-500">Error: {error}</p>
+        <Button asChild variant="link" className="mt-4">
+          <Link to="/submissions/user-submissions">
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to My Submissions
+          </Link>
+        </Button>
       </div>
     );
   }
 
   if (!submission) {
-    return <div className="p-4 text-muted-foreground">Submission not found.</div>;
+    return (
+        <div className="flex flex-col items-center justify-center h-64">
+            <p className="text-muted-foreground">Submission not found.</p>
+            <Button asChild variant="link" className="mt-4">
+            <Link to="/submissions/user-submissions">
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Back to My Submissions
+            </Link>
+            </Button>
+        </div>
+    );
   }
 
   return (
@@ -106,7 +145,9 @@ export default function SubmissionDetailPage() {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <p className="font-medium">Problem:</p>
-              <p>{submission.problemId.title}</p>
+              <Link to={`/problems/${submission.problemId._id}`} className="text-blue-500 hover:underline">
+                {submission.problemId.title}
+              </Link>
             </div>
             <div>
               <p className="font-medium">Language:</p>
@@ -114,7 +155,9 @@ export default function SubmissionDetailPage() {
             </div>
             <div>
               <p className="font-medium">User:</p>
-              <p>{submission.userId.username}</p>
+              <Link to={`/forum/users/${submission.userId._id}`} className="text-blue-500 hover:underline">
+                {submission.userId.username}
+              </Link>
             </div>
             {submission.executionTime !== undefined && (
               <div>

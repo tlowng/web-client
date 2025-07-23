@@ -14,42 +14,52 @@ import {
   Code, 
   Clock, 
   MemoryStick, 
-  CheckCircle, 
+  CheckCircle2, 
   XCircle, 
   AlertCircle,
   RefreshCw,
   Filter,
-  Calendar
+  Calendar,
+  Loader2
 } from 'lucide-react';
 import { useBreadcrumbTitle } from '@/contexts/breadcrumb-context';
 
 const getStatusIcon = (status: string) => {
   switch (status) {
     case 'Accepted':
-      return <CheckCircle className="h-4 w-4 text-green-500" />;
+      return <CheckCircle2 className="h-4 w-4 text-green-500" />;
     case 'Wrong Answer':
     case 'Time Limit Exceeded':
     case 'Memory Limit Exceeded':
     case 'Runtime Error':
     case 'Compilation Error':
       return <XCircle className="h-4 w-4 text-red-500" />;
+    case 'In Queue':
+    case 'Judging':
+    case 'Pending':
+      return <Loader2 className="h-4 w-4 animate-spin" />;
     default:
-      return <AlertCircle className="h-4 w-4 text-yellow-500" />;
+      return <AlertCircle className="h-4 w-4" />;
   }
 };
 
-const getStatusVariant = (status: string) => {
-  switch (status) {
-    case 'Accepted':
-      return 'default';
-    case 'Pending':
-    case 'In Queue':
-    case 'Judging':
-      return 'secondary';
-    default:
-      return 'destructive';
-  }
-};
+  const getStatusVariant = (status: string) => {
+    switch (status) {
+      case 'Accepted':
+        return 'default';
+      case 'Wrong Answer':
+      case 'Time Limit Exceeded':
+      case 'Runtime Error':
+      case 'Compilation Error':
+        return 'destructive';
+      case 'In Queue':
+      case 'Judging':
+      case 'Pending':
+        return 'secondary';
+      default:
+        return 'outline';
+    }
+  };
 
 export default function UserSubmissionsPage() {
   const [statusFilter, setStatusFilter] = useState<string>('all');
@@ -121,7 +131,7 @@ export default function UserSubmissionsPage() {
 
       {/* Filters */}
       <Card>
-        <CardContent className="p-4">
+        <CardContent className="pt-2 pb-2 pl-4 pr-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Select value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger>
@@ -230,18 +240,17 @@ export default function UserSubmissionsPage() {
                     </TableCell>
                     
                     <TableCell className="text-center">
-                      <Badge 
-                        variant={getStatusVariant(submission.status)}
-                        className="flex items-center gap-1 w-fit mx-auto"
-                      >
+                      <div className={`flex items-center justify-center gap-1.5`}>
                         {getStatusIcon(submission.status)}
-                        {submission.status}
-                      </Badge>
+                        <Badge variant={getStatusVariant(submission.status)} className="text-xs">
+                          {submission.status}
+                        </Badge>
+                      </div>
                     </TableCell>
                     
                     <TableCell className="text-center">
                       <Badge variant="outline">
-                        {submission.language.toUpperCase()}
+                        {submission.language.toLowerCase()}
                       </Badge>
                     </TableCell>
                     

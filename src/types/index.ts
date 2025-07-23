@@ -286,6 +286,14 @@ export interface PopulatedSubmissionResult extends Omit<SubmissionResult, 'probl
   };
 }
 
+export interface FullyPopulatedSubmissionResult extends Omit<PopulatedSubmissionResult, 'userId'> {
+  userId: {
+    _id: string;
+    username: string;
+  };
+}
+
+
 // ==================== FORUM TYPES ====================
 export interface ForumCategory {
   _id: string;

@@ -54,6 +54,7 @@ export default function App() {
                 <Routes>
                   {/* Forum Routes */}
                   <Route path="/" element={<ForumPage />} />
+                  <Route path="/forum" element={<ForumPage />} />
                   <Route path="/forum/:slug" element={<ForumCategoryPage />} />
                   <Route path="/forum/topic/:slug" element={<ForumTopicPage />} />
                   <Route path="/forum/leaderboard" element={<ForumLeaderboardPage />} />

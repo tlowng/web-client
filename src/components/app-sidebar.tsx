@@ -20,7 +20,7 @@ const Brand: React.FC = () => {
     return (
         <Link to="/">
             {state === 'collapsed' ? (
-                <img src="/temp.png" alt="iuhaanhhlamdayhaanhbtk?" className="w-8 h-8" />
+                <img src="/temp.png" alt="iuhaanhhlamdayhaanhbtk?" className="w-8 h-8 rounded-sm" />
             ) : (
                 <span className="text-xl font-bold text-accent p-2">AwlOJ</span>
             )}

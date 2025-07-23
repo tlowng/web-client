@@ -9,6 +9,7 @@ import {
   Sparkles,
   Loader2,
   User,
+  Settings,
 } from "lucide-react"
 
 import {
@@ -108,7 +109,7 @@ export function NavUser() {
                 className="data-[state=open]:bg-accent data-[state=open]:text-accent-foreground"
               >
                 <Avatar className="h-8 w-8 rounded-lg">
-                  <AvatarImage src={currentUser.avatar || "/avatars/user.jpg"} alt={currentUser.username} />
+                  <AvatarImage src={currentUser.avatar || `https://github.com/${currentUser.username}.png`} alt={currentUser.username} />
                   <AvatarFallback className="rounded-lg">{currentUser.username ? currentUser.username.charAt(0).toUpperCase() : ''}</AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
@@ -127,7 +128,7 @@ export function NavUser() {
               <DropdownMenuLabel className="p-0 font-normal">
                 <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                   <Avatar className="h-8 w-8 rounded-lg">
-                    <AvatarImage src={currentUser.avatar || "/avatars/user.jpg"} alt={currentUser.username} />
+                     <AvatarImage src={currentUser.avatar || `https://github.com/${currentUser.username}.png`} alt={currentUser.username} />
                     <AvatarFallback className="rounded-lg">{currentUser.username ? currentUser.username.charAt(0).toUpperCase() : ''}</AvatarFallback>
                   </Avatar>
                   <div className="grid flex-1 text-left text-sm leading-tight">
@@ -136,28 +137,15 @@ export function NavUser() {
                   </div>
                 </div>
               </DropdownMenuLabel>
+
               <DropdownMenuSeparator />
+  
               <DropdownMenuGroup>
-                <DropdownMenuItem>
-                  <Sparkles />
-                  Upgrade to Pro
-                </DropdownMenuItem>
-              </DropdownMenuGroup>
-              <DropdownMenuSeparator />
-              <DropdownMenuGroup>
-                <DropdownMenuItem>
-                  <BadgeCheck />
-                  Account
-                </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link to={`/forum/profile/${currentUser._id}`}>
-                    <User/>
+                   <BadgeCheck />
                     My Profile
                   </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <CreditCard />
-                  Billing
                 </DropdownMenuItem>
                 <DropdownMenuItem>
                   <Bell />
@@ -165,6 +153,13 @@ export function NavUser() {
                 </DropdownMenuItem>
               </DropdownMenuGroup>
               <DropdownMenuSeparator />
+
+              <DropdownMenuGroup>
+                <DropdownMenuItem>
+                  <Settings />
+                  Settings
+                </DropdownMenuItem>
+              </DropdownMenuGroup>
               <DropdownMenuItem onClick={handleLogout}>
                 <LogOut />
                 Log out
