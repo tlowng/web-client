@@ -17,6 +17,10 @@ import { BreadcrumbProvider } from "@/contexts/breadcrumb-context";
 
 // Pages
 import AdminProblemsPage from './pages/AdminProblemsPage';
+import ContestsPage from './pages/ContestsPage';
+import ContestDetailPage from './pages/ContestDetailPage';
+import ContestDashboardPage from './pages/ContestDashboardPage';
+import ContestStandingsPage from './pages/ContestStandingsPage';
 import ForumCategoryPage from './pages/ForumCategoryPage';
 import ForumLeaderboardPage from './pages/ForumLeaderboardPage';
 import ForumPage from './pages/ForumPage';
@@ -66,6 +70,10 @@ export default function App() {
                   <Route path="/problems/:id" element={<ProblemDetailPage />} />
                   <Route path="/submissions/user-submissions" element={<UserSubmissionsPage />} />
                   <Route path="/submissions/:id" element={<SubmissionDetailPage />} />
+
+                  {/*Contests Page nah this is so much time to make */}
+
+                  <Route path='/contests' element={<ContestsPage/>}/>
                   
                   {/* User & Auth Routes */}
                   <Route path="/login" element={<LoginPage />} />

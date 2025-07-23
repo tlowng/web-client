@@ -9,6 +9,11 @@ export const navData = {
       icon: Home,
     },
     {
+      title: "Contests",
+      url: "/contests",
+      icon: Trophy,
+    },
+    {
       title: "Problem List",
       url: "/problems",
       icon: List,
