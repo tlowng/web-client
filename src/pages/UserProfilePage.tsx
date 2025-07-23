@@ -1,4 +1,4 @@
-// src/pages/UserProfilePage.tsx - FIXED VERSION
+// src/pages/UserProfilePage.tsx - FINAL CLEANED VERSION
 import { useState, useCallback, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useFetch } from '@/hooks/use-fetch';
@@ -18,7 +18,6 @@ import {
   MapPin, 
   Globe, 
   Github, 
-  Calendar, 
   Star, 
   MessageSquare, 
   FileText, 
@@ -28,12 +27,11 @@ import {
   ExternalLink,
   Activity,
   Clock,
-  Eye,
   Edit3
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useBreadcrumbTitle } from '@/contexts/breadcrumb-context';
-import type { UserProfile, UserWithProfile } from '@/types';
+import type { UserProfile, UserWithPopulatedActivity } from '@/types';
 
 export default function UserProfilePage() {
   const { userId } = useParams<{ userId: string }>();
@@ -65,12 +63,12 @@ export default function UserProfilePage() {
     checkCurrentUser();
   }, []);
 
-  const fetchUserProfile = useCallback(async (): Promise<UserWithProfile> => {
+  const fetchUserProfile = useCallback(async (): Promise<UserWithPopulatedActivity> => {
     if (!userId) throw new Error('User ID is required');
-    return await getForumProfile(userId);
+    return await getForumProfile(userId) as UserWithPopulatedActivity;
   }, [userId]);
 
-  const { data: userProfile, loading, error, refetch } = useFetch<UserWithProfile>(
+  const { data: userProfile, loading, error, refetch } = useFetch<UserWithPopulatedActivity>(
     fetchUserProfile,
     null,
     [userId]
@@ -481,7 +479,7 @@ export default function UserProfilePage() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                {recentActivity.topics.length > 0 && (
+                {recentActivity.topics?.length > 0 && (
                   <div>
                     <h4 className="font-medium mb-2 flex items-center gap-2">
                       <FileText className="h-4 w-4" />
@@ -491,7 +489,7 @@ export default function UserProfilePage() {
                       {recentActivity.topics.map((topic) => (
                         <div key={topic._id} className="border-l-2 border-blue-500 pl-3">
                           <Link 
-                            to={`/forum/topics/${topic.slug}`}
+                            to={`/forum/topic/${topic.slug}`}
                             className="font-medium hover:underline text-sm"
                           >
                             {topic.title}
@@ -505,31 +503,34 @@ export default function UserProfilePage() {
                   </div>
                 )}
 
-                {recentActivity.posts.length > 0 && (
+                {recentActivity.posts?.length > 0 && (
                   <div>
                     <h4 className="font-medium mb-2 flex items-center gap-2">
                       <MessageSquare className="h-4 w-4" />
                       Recent Posts
                     </h4>
                     <div className="space-y-2">
-                      {recentActivity.posts.slice(0, 5).map((post) => (
-                        <div key={post._id} className="border-l-2 border-green-500 pl-3">
-                          <Link 
-                            to={`/forum/topics/${post.topic}`}
-                            className="font-medium hover:underline text-sm"
-                          >
-                            Re: {post.topic}
-                          </Link>
-                          <p className="text-xs text-muted-foreground">
-                            {new Date(post.createdAt).toLocaleDateString()}
-                          </p>
-                        </div>
+                      {recentActivity.posts
+                        .slice(0, 5)
+                        .filter(post => post.topic) // Filter out posts with null topics
+                        .map((post) => (
+                          <div key={post._id} className="border-l-2 border-green-500 pl-3">
+                            <Link 
+                              to={`/forum/topic/${post.topic.slug}`}
+                              className="font-medium hover:underline text-sm"
+                            >
+                              Re: {post.topic.title}
+                            </Link>
+                            <p className="text-xs text-muted-foreground">
+                              {new Date(post.createdAt).toLocaleDateString()}
+                            </p>
+                          </div>
                       ))}
                     </div>
                   </div>
                 )}
 
-                {(!recentActivity.topics.length && !recentActivity.posts.length) && (
+                {(!recentActivity?.topics?.length && !recentActivity?.posts?.length) && (
                   <div className="text-center py-8 text-muted-foreground">
                     <Activity className="h-12 w-12 mx-auto mb-4 opacity-50" />
                     <p>No recent activity</p>

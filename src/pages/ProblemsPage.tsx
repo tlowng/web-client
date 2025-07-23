@@ -1,9 +1,9 @@
-// src/pages/ProblemsPage.tsx - FIXED VERSION
+// src/pages/ProblemsPage.tsx - FINAL CLEANED VERSION
 import { useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { useFetch } from '@/hooks/use-fetch';
 import { getProblems } from '@/api';
-import type { ProblemData } from '@/types'; // Use ProblemData instead of Problem
+import type { ProblemData } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -22,7 +22,6 @@ export default function ProblemsPage() {
 
   useBreadcrumbTitle('Problems');
 
-  // Use ProblemData[] instead of Problem[]
   const fetchProblems = useCallback(async (): Promise<ProblemData[]> => {
     const filters: any = {};
     
@@ -47,7 +46,6 @@ export default function ProblemsPage() {
     [searchTerm, selectedDifficulty, selectedTags]
   );
 
-  // Rest of component remains the same...
   return (
     <div className="p-4 space-y-6">
       {/* Header */}
@@ -150,7 +148,7 @@ export default function ProblemsPage() {
               <p>No problems found matching your criteria.</p>
             </div>
           ) : (
-            <Table>
+            <Table>{/* No extra whitespace */}
               <TableHeader>
                 <TableRow>
                   <TableHead>Problem</TableHead>
@@ -187,7 +185,6 @@ export default function ProblemsPage() {
                         )}
                       </div>
                     </TableCell>
-                    
                     <TableCell className="text-center">
                       <Badge 
                         variant={getDifficultyVariant(problem.difficulty)}
@@ -196,21 +193,18 @@ export default function ProblemsPage() {
                         {problem.difficulty}
                       </Badge>
                     </TableCell>
-                    
                     <TableCell className="text-center">
                       <div className="flex items-center justify-center gap-1">
                         <Clock className="h-4 w-4 text-muted-foreground" />
                         <span className="text-sm">{problem.timeLimit}ms</span>
                       </div>
                     </TableCell>
-                    
                     <TableCell className="text-center">
                       <div className="flex items-center justify-center gap-1">
                         <MemoryStick className="h-4 w-4 text-muted-foreground" />
                         <span className="text-sm">{problem.memoryLimit}MB</span>
                       </div>
                     </TableCell>
-                    
                     <TableCell>
                       <Link to={`/problems/${problem._id}`}>
                         <Button size="sm" variant="outline">

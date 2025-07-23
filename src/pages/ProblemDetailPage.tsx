@@ -33,20 +33,20 @@ int main() {
 };
 
 export default function ProblemDetailPage() {
-  const { problemId } = useParams<{ problemId: string }>();
+  const { id } = useParams<{ id: string }>();
   const [selectedLanguage, setSelectedLanguage] = useState('cpp');
   const [code, setCode] = useState(DEFAULT_CODE[selectedLanguage as keyof typeof DEFAULT_CODE]);
   const [submitting, setSubmitting] = useState(false);
 
   const fetchProblem = useCallback(async (): Promise<ProblemData> => {
-    if (!problemId) throw new Error('Problem ID is required');
-    return await getProblemById(problemId);
-  }, [problemId]);
+    if (!id) throw new Error('Problem ID is required');
+    return await getProblemById(id);
+  }, [id]);
 
   const { data: problem, loading, error, refetch } = useFetch<ProblemData>(
     fetchProblem,
     null,
-    [problemId]
+    [id]
   );
 
   useBreadcrumbTitle(problem?.title || 'Problem Detail');

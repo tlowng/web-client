@@ -1,4 +1,5 @@
 // src/components/dynamic-breadcrumb.tsx
+import React from 'react';
 import { Link } from 'react-router-dom';
 import {
   Breadcrumb,
@@ -17,8 +18,8 @@ export function DynamicBreadcrumb() {
     <Breadcrumb>
       <BreadcrumbList>
         {breadcrumbItems.map((item, index) => (
-
-            <BreadcrumbItem key={`${item.title}-${index}`}>
+          <React.Fragment key={`${item.title}-${index}`}>
+            <BreadcrumbItem>
               {item.isCurrentPage ? (
                 <BreadcrumbPage>{item.title}</BreadcrumbPage>
               ) : (
@@ -26,10 +27,9 @@ export function DynamicBreadcrumb() {
                   <Link to={item.href || '#'}>{item.title}</Link>
                 </BreadcrumbLink>
               )}
-              {index < breadcrumbItems.length - 1 && <BreadcrumbSeparator />}
             </BreadcrumbItem>
-            
-
+            {index < breadcrumbItems.length - 1 && <BreadcrumbSeparator />}
+          </React.Fragment>
         ))}
       </BreadcrumbList>
     </Breadcrumb>

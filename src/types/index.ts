@@ -98,9 +98,8 @@ export interface UserProfile {
   username: string;
   email: string;
   role: UserRole;
-  avatar?: string;
   createdAt: string;
-  updatedAt?: string;
+  updatedAt: string;
 }
 
 export interface AuthResponse {
@@ -280,6 +279,13 @@ export interface SubmissionResult {
   updatedAt: string;
 }
 
+export interface PopulatedSubmissionResult extends Omit<SubmissionResult, 'problemId'> {
+  problemId: {
+    _id: string;
+    title: string;
+  };
+}
+
 // ==================== FORUM TYPES ====================
 export interface ForumCategory {
   _id: string;
@@ -387,6 +393,21 @@ export interface UserWithProfile {
   recentActivity?: {
     topics: ForumTopic[];
     posts: ForumPost[];
+  };
+}
+
+export interface PopulatedForumPost extends Omit<ForumPost, 'topic'> {
+  topic: {
+    _id: string;
+    slug: string;
+    title: string;
+  };
+}
+
+export interface UserWithPopulatedActivity extends Omit<UserWithProfile, 'recentActivity'> {
+   recentActivity?: {
+    topics: ForumTopic[];
+    posts: PopulatedForumPost[];
   };
 }
 
@@ -720,15 +741,6 @@ export interface ForumProfilePopulated extends Omit<ForumProfile, 'user'> {
   user: UserProfile; // user field is populated with full UserProfile object
 }
 
-export interface UserWithProfile {
-  user: UserProfile;
-  profile: ForumProfile;
-  recentActivity?: {
-    topics: ForumTopic[];
-    posts: ForumPost[];
-  };
-}
-
 // Leaderboard specific types
 export interface LeaderboardEntry extends Omit<ForumProfile, 'user'> {
   user: UserProfile; // populated user data
@@ -743,28 +755,3 @@ export interface LeaderboardResponse {
     pages: number;
   };
 }
-
-// Update existing ForumProfile to clarify it's unpopulated
-export interface ForumProfile {
-  _id: string;
-  user: string; // ObjectId as string - NOT populated
-  signature?: string;
-  avatar?: string;
-  title?: string;
-  location?: string;
-  website?: string;
-  githubProfile?: string;
-  postCount: number;
-  topicCount: number;
-  reputation: number;
-  lastSeen: string;
-  preferences: {
-    emailNotifications: boolean;
-    showOnlineStatus: boolean;
-  };
-  createdAt: string;
-  updatedAt: string;
-}
-
-// ==================== EXPORT ALL ====================
-export * from '@/api';

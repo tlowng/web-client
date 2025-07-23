@@ -1,9 +1,9 @@
-// src/pages/UserSubmissionsPage.tsx - FIXED VERSION
+// src/pages/UserSubmissionsPage.tsx - FINAL CLEANED VERSION
 import { useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { useFetch } from '@/hooks/use-fetch';
 import { getUserSubmissions } from '@/api';
-import type { SubmissionResult } from '@/types';
+import type { PopulatedSubmissionResult } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -57,7 +57,7 @@ export default function UserSubmissionsPage() {
 
   useBreadcrumbTitle('My Submissions');
 
-  const fetchSubmissions = useCallback(async (): Promise<SubmissionResult[]> => {
+  const fetchSubmissions = useCallback(async (): Promise<PopulatedSubmissionResult[]> => {
     const filters: any = {};
     
     if (statusFilter !== 'all') {
@@ -71,7 +71,7 @@ export default function UserSubmissionsPage() {
     return await getUserSubmissions(filters);
   }, [statusFilter, languageFilter]);
 
-  const { data: submissions, loading, error, refetch } = useFetch<SubmissionResult[]>(
+  const { data: submissions, loading, error, refetch } = useFetch<PopulatedSubmissionResult[]>(
     fetchSubmissions,
     [],
     [statusFilter, languageFilter]
@@ -216,14 +216,16 @@ export default function UserSubmissionsPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {submissions?.map((submission) => (
+                {submissions
+                  ?.filter(sub => sub.problemId)
+                  .map((submission) => (
                   <TableRow key={submission._id} className="hover:bg-muted/50">
                     <TableCell>
                       <Link 
-                        to={`/problems/${submission.problemId}`}
+                        to={`/problems/${submission.problemId._id}`}
                         className="font-medium hover:text-primary transition-colors"
                       >
-                        Problem {submission.problemId}
+                        {submission.problemId.title}
                       </Link>
                     </TableCell>
                     
