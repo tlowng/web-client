@@ -17,7 +17,8 @@ import {
   Settings,
   TrendingUp,
   List,
-  ExternalLink
+  ExternalLink,
+  Trophy
 } from 'lucide-react';
 import { getMe } from '@/api';
 import type { UserProfile } from '@/types';
@@ -146,6 +147,19 @@ function AdminPanelContent() {
                 <div className="font-medium">Categories Management</div>
                 <div className="text-xs text-muted-foreground">Forum categories</div>
               </div>
+            </Button>
+            
+            <Button variant="outline" className="h-24 flex-col gap-2 justify-start p-4" asChild>
+              <Link to="/admin/contests">
+                <div className="flex items-center gap-2 mb-2">
+                  <Trophy className="h-5 w-5 text-yellow-600" />
+                  <ExternalLink className="h-3 w-3 text-muted-foreground" />
+                </div>
+                <div className="text-center">
+                  <div className="font-medium">Contest Management</div>
+                  <div className="text-xs text-muted-foreground">Create & manage contests</div>
+                </div>
+              </Link>
             </Button>
             
             <Button variant="outline" className="h-24 flex-col gap-2 justify-start p-4">
