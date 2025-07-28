@@ -3,7 +3,7 @@ import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useFetch } from '@/hooks/use-fetch';
 import { createContest, getProblems } from '@/api';
-import type { ContestFormData, ProblemData } from '@/types';
+import type { ContestFormData, ProblemData, ContestType, ScoringSystem } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -19,17 +19,26 @@ import {
   Save,
   Plus,
   X,
-  Info,
-  Calendar,
-  Clock,
-  Settings,
-  Code,
-  AlertCircle
+  Info
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useBreadcrumbTitle } from '@/contexts/breadcrumb-context';
 
 const LANGUAGES = ['cpp', 'java', 'python', 'javascript', 'go', 'rust'];
+
+// Helper to get current local datetime string for input default
+const toLocalISOString = (date: Date) => {
+  const tzo = -date.getTimezoneOffset();
+  const dif = tzo >= 0 ? '+' : '-';
+  const pad = (num: number) => (num < 10 ? '0' : '') + num;
+
+  return date.getFullYear() +
+    '-' + pad(date.getMonth() + 1) +
+    '-' + pad(date.getDate()) +
+    'T' + pad(date.getHours()) +
+    ':' + pad(date.getMinutes());
+};
+
 
 export default function CreateContestPage() {
   const navigate = useNavigate();
@@ -43,10 +52,10 @@ export default function CreateContestPage() {
   const [formData, setFormData] = useState<ContestFormData>({
     title: '',
     description: '',
-    startTime: '',
-    endTime: '',
-    type: 'public',
-    scoringSystem: 'ICPC',
+    startTime: toLocalISOString(new Date(Date.now() + 60 * 60 * 1000)), // Default to 1 hour from now
+    endTime: toLocalISOString(new Date(Date.now() + 2 * 60 * 60 * 1000)), // Default to 2 hours from now
+    type: 'public' as ContestType,
+    scoringSystem: 'ICPC' as ScoringSystem,
     allowedLanguages: ['cpp', 'java', 'python'],
     maxSubmissions: 0,
     freezeTime: 60,
@@ -65,7 +74,8 @@ export default function CreateContestPage() {
   useBreadcrumbTitle('Create Contest');
 
   const fetchProblems = useCallback(async (): Promise<ProblemData[]> => {
-    return await getProblems({});
+    const response = await getProblems({});
+    return response.problems;
   }, []);
 
   const { data: problems = [], loading: problemsLoading } = useFetch<ProblemData[]>(
@@ -130,6 +140,10 @@ export default function CreateContestPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    const startTime = new Date(formData.startTime);
+    const endTime = new Date(formData.endTime);
+    const now = new Date();
+
     // Validation
     if (!formData.title || !formData.description) {
       toast.error('Please fill in all required fields');
@@ -141,20 +155,23 @@ export default function CreateContestPage() {
       return;
     }
 
-    if (new Date(formData.startTime) <= new Date()) {
+    if (startTime <= now) {
       toast.error('Start time must be in the future');
       return;
     }
 
-    if (new Date(formData.endTime) <= new Date(formData.startTime)) {
+    if (endTime <= startTime) {
       toast.error('End time must be after start time');
       return;
     }
 
     setSubmitting(true);
     try {
+      // Send UTC strings to backend
       const contestData: ContestFormData = {
         ...formData,
+        startTime: startTime.toISOString(),
+        endTime: endTime.toISOString(),
         problems: selectedProblems
       };
 
@@ -316,7 +333,7 @@ export default function CreateContestPage() {
                     <h4 className="font-medium mb-3">Selected Problems ({selectedProblems.length})</h4>
                     <div className="space-y-2">
                       {selectedProblems.map((sp) => {
-                        const problem = problems.find(p => p._id === sp.problemId);
+                        const problem = problems?.find(p => p._id === sp.problemId);
                         return (
                           <div key={sp.problemId} className="flex items-center justify-between p-3 border rounded-lg">
                             <div className="flex items-center gap-3">
@@ -356,11 +373,11 @@ export default function CreateContestPage() {
                   <h4 className="font-medium mb-3">Available Problems</h4>
                   {problemsLoading ? (
                     <p className="text-muted-foreground">Loading problems...</p>
-                  ) : problems.length === 0 ? (
+                  ) : problems?.length === 0 ? (
                     <p className="text-muted-foreground">No problems available</p>
                   ) : (
                     <div className="space-y-2 max-h-96 overflow-y-auto">
-                      {problems.filter(p => !selectedProblems.find(sp => sp.problemId === p._id)).map((problem) => (
+                      {problems?.filter(p => !selectedProblems.find(sp => sp.problemId === p._id)).map((problem) => (
                         <div 
                           key={problem._id} 
                           className="flex items-center justify-between p-3 border rounded-lg hover:bg-accent/50"
@@ -528,7 +545,7 @@ export default function CreateContestPage() {
                     />
                     <Label htmlFor="enablePlagiarismCheck">
                       Enable plagiarism detection
-                    </Label>
+                    </el-label>
                   </div>
 
                   <div className="flex items-center space-x-2">

@@ -217,7 +217,7 @@ export interface ContestSubmission {
 
 export interface ContestSubmissionData {
   contestId: string;
-  problemId: string; // Problem Label A,B,C...
+  problemLabel: string; // Problem Label A,B,C...
   code: string;
   language: string;
 }

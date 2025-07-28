@@ -65,8 +65,8 @@ export default function ContestDetailPage() {
     }
   };
   
-  const isCreator = currentUser && contest && contest.createdBy._id === currentUser._id;
-  const isRegistered = currentUser && contest && contest.participants.some(p => p.user._id === currentUser._id);
+  const isCreator = currentUser && contest && contest.createdBy?._id === currentUser._id;
+  const isRegistered = currentUser && contest && contest.participants?.some(p => p.user?._id === currentUser._id);
 
   if (loading) {
     return (
@@ -183,17 +183,17 @@ export default function ContestDetailPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {contest.problems.map(({ problem, label, points }) => (
-                    <TableRow key={problem._id}>
+                  {contest.problems?.map(({ problem, label, points }) => (
+                    <TableRow key={problem?._id}>
                       <TableCell>{label}</TableCell>
                       <TableCell>
-                         <Link to={`/problems/${problem._id}`} className="hover:underline text-blue-500">
-                          {problem.title}
+                         <Link to={`/problems/${problem?._id}`} className="hover:underline text-blue-500">
+                          {problem?.title}
                         </Link>
                       </TableCell>
                       <TableCell>
-                        <Badge variant={getDifficultyVariant(problem.difficulty)}>
-                          {problem.difficulty}
+                        <Badge variant={getDifficultyVariant(problem?.difficulty)}>
+                          {problem?.difficulty}
                         </Badge>
                       </TableCell>
                       <TableCell>{points}</TableCell>
@@ -253,7 +253,7 @@ export default function ContestDetailPage() {
               </div>
               <div className="flex justify-between">
                 <strong>Created By:</strong>
-                <span>{contest.createdBy.username}</span>
+                <span>{contest.createdBy?.username || 'N/A'}</span>
               </div>
             </CardContent>
           </Card>
@@ -266,12 +266,12 @@ export default function ContestDetailPage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              {contest.participants.length > 0 ? (
+              {contest.participants?.length > 0 ? (
                 <ul className="space-y-2 max-h-48 overflow-y-auto">
                   {contest.participants.map(p => (
-                    <li key={p.user._id}>
-                      <Link to={`/forum/users/${p.user._id}`} className="text-sm hover:underline">
-                        {p.user.username}
+                    <li key={p.user?._id}>
+                      <Link to={`/forum/users/${p.user?._id}`} className="text-sm hover:underline">
+                        {p.user?.username || 'Unknown User'}
                       </Link>
                     </li>
                   ))}

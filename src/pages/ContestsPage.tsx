@@ -1,9 +1,9 @@
 // src/pages/ContestsPage.tsx
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useFetch } from '@/hooks/use-fetch';
-import { getContests } from '@/api';
-import type { Contest } from '@/types';
+import { getContests, getMe } from '@/api';
+import type { Contest, UserProfile, UserRole } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -64,6 +64,21 @@ export default function ContestsPage() {
   const [typeFilter, setTypeFilter] = useState<string>('all');
   const [page, setPage] = useState(1);
   const limit = 20;
+  const [currentUser, setCurrentUser] = useState<UserProfile | null>(null);
+
+  useEffect(() => {
+    // Lấy thông tin người dùng hiện tại để kiểm tra quyền
+    const fetchUser = async () => {
+      try {
+        const user = await getMe();
+        setCurrentUser(user);
+      } catch (error) {
+        console.error("Failed to fetch user:", error);
+        setCurrentUser(null);
+      }
+    };
+    fetchUser();
+  }, []);
 
   useBreadcrumbTitle('Contests');
 
@@ -84,6 +99,7 @@ export default function ContestsPage() {
 
   const contests = data?.contests || [];
   const pagination = data?.pagination;
+  const isAdmin = currentUser?.role === 'admin' as UserRole;
 
   if (error) {
     return (
@@ -119,13 +135,14 @@ export default function ContestsPage() {
             <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
           </Button>
           
-          {/* Admin: Create Contest Button */}
-          <Button asChild>
-            <Link to="/admin/contests/create">
-              <Plus className="h-4 w-4 mr-2" />
-              Create Contest
-            </Link>
-          </Button>
+          {isAdmin && (
+            <Button asChild>
+              <Link to="/admin/contests/create">
+                <Plus className="h-4 w-4 mr-2" />
+                Create Contest
+              </Link>
+            </Button>
+          )}
         </div>
       </div>
 

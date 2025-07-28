@@ -52,13 +52,10 @@ export const registerForContest = async (data: ContestRegistrationData) => {
 
 // Submit solution to contest problem
 export const submitToContest = async (data: ContestSubmissionData) => {
-  const { contestId, problemId, ...submissionData } = data;
+  const { contestId, ...submissionData } = data;
   const response = await api.post<ApiResponse<{ submissionId: string }>>(
     `/contests/${contestId}/submit`,
-    {
-      problemLabel: problemId, // problemId is the label (A, B, C...)
-      ...submissionData
-    }
+    submissionData
   );
   return response.data;
 };
