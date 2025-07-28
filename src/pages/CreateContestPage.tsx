@@ -73,12 +73,16 @@ export default function CreateContestPage() {
   useBreadcrumbTitle('Create Contest');
 
   const fetchProblems = useCallback(async (): Promise<ProblemsListResponse> => {
-    return await getProblems({});
+    // The backend might return just the array, so we wrap it
+    const result = await getProblems({});
+    if (Array.isArray(result)) {
+      return { problems: result, pagination: { page: 1, limit: result.length, total: result.length, pages: 1 } };
+    }
+    return result;
   }, []);
 
   const { data: problemsData, loading: problemsLoading } = useFetch<ProblemsListResponse>(
-    fetchProblems,
-    { problems: [], pagination: { page: 1, limit: 20, total: 0, pages: 1 }}
+    fetchProblems
   );
   
   const problems = problemsData?.problems || [];
