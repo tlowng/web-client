@@ -128,7 +128,7 @@ export default function ContestDashboardPage() {
     try {
       await submitToContest({
         contestId: id,
-        problemId: selectedProblem.label,
+        problemLabel: selectedProblem.label,
         code,
         language: selectedLanguage
       });

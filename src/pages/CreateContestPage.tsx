@@ -3,7 +3,7 @@ import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useFetch } from '@/hooks/use-fetch';
 import { createContest, getProblems } from '@/api';
-import type { ContestFormData, ProblemData, ContestType, ScoringSystem } from '@/types';
+import type { ContestFormData, ProblemData, ContestType, ScoringSystem, ProblemsListResponse } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -29,7 +29,6 @@ const LANGUAGES = ['cpp', 'java', 'python', 'javascript', 'go', 'rust'];
 // Helper to get current local datetime string for input default
 const toLocalISOString = (date: Date) => {
   const tzo = -date.getTimezoneOffset();
-  const dif = tzo >= 0 ? '+' : '-';
   const pad = (num: number) => (num < 10 ? '0' : '') + num;
 
   return date.getFullYear() +
@@ -73,15 +72,16 @@ export default function CreateContestPage() {
 
   useBreadcrumbTitle('Create Contest');
 
-  const fetchProblems = useCallback(async (): Promise<ProblemData[]> => {
-    const response = await getProblems({});
-    return response.problems;
+  const fetchProblems = useCallback(async (): Promise<ProblemsListResponse> => {
+    return await getProblems({});
   }, []);
 
-  const { data: problems = [], loading: problemsLoading } = useFetch<ProblemData[]>(
+  const { data: problemsData, loading: problemsLoading } = useFetch<ProblemsListResponse>(
     fetchProblems,
-    []
+    { problems: [], pagination: { page: 1, limit: 20, total: 0, pages: 1 }}
   );
+  
+  const problems = problemsData?.problems || [];
 
   const handleAddProblem = (problemId: string) => {
     if (selectedProblems.find(p => p.problemId === problemId)) {
@@ -441,7 +441,7 @@ export default function CreateContestPage() {
                           onCheckedChange={() => handleLanguageToggle(lang)}
                         />
                         <Label htmlFor={lang} className="cursor-pointer">
-                          {lang}
+                          {lang.charAt(0).toUpperCase() + lang.slice(1)}
                         </Label>
                       </div>
                     ))}
@@ -545,7 +545,7 @@ export default function CreateContestPage() {
                     />
                     <Label htmlFor="enablePlagiarismCheck">
                       Enable plagiarism detection
-                    </el-label>
+                    </Label>
                   </div>
 
                   <div className="flex items-center space-x-2">
