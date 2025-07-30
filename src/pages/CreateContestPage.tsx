@@ -28,7 +28,6 @@ const LANGUAGES = ['cpp', 'java', 'python', 'javascript', 'go', 'rust'];
 
 // Helper to get current local datetime string for input default
 const toLocalISOString = (date: Date) => {
-  const tzo = -date.getTimezoneOffset();
   const pad = (num: number) => (num < 10 ? '0' : '') + num;
 
   return date.getFullYear() +

@@ -1,4 +1,3 @@
-// src/pages/ForumPage.tsx
 import { Card, CardContent } from '@/components/ui/card';
 import { useFetch } from '@/hooks/use-fetch';
 import { getForumCategories, getForumTopics, searchForumTopics } from '@/api';

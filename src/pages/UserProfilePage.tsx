@@ -1,4 +1,3 @@
-// src/pages/UserProfilePage.tsx - FINAL CLEANED VERSION
 import { useState, useCallback, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useFetch } from '@/hooks/use-fetch';

@@ -1,4 +1,3 @@
-// src/pages/ForumCategoryPage.tsx
 import { useParams, Link } from 'react-router-dom';
 import { useFetch } from '@/hooks/use-fetch';
 import { getForumTopics, getCategoryBySlug, getForumCategories } from '@/api';

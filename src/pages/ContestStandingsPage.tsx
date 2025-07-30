@@ -13,7 +13,6 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { 
   Trophy, 
   Medal,
-  Clock,
   CheckCircle,
   XCircle,
   AlertCircle,

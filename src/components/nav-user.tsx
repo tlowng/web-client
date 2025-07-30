@@ -4,11 +4,8 @@ import {
   BadgeCheck,
   Bell,
   ChevronsUpDown,
-  CreditCard,
   LogOut,
-  Sparkles,
   Loader2,
-  User,
   Settings,
 } from "lucide-react"
 
@@ -109,7 +106,7 @@ export function NavUser() {
                 className="data-[state=open]:bg-accent data-[state=open]:text-accent-foreground"
               >
                 <Avatar className="h-8 w-8 rounded-lg">
-                  <AvatarImage src={currentUser.avatar || `https://github.com/${currentUser.username}.png`} alt={currentUser.username} />
+                  <AvatarImage src={/*currentUser.avatar ||*/ `https://github.com/${currentUser.username}.png`} alt={currentUser.username} />
                   <AvatarFallback className="rounded-lg">{currentUser.username ? currentUser.username.charAt(0).toUpperCase() : ''}</AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
@@ -128,7 +125,7 @@ export function NavUser() {
               <DropdownMenuLabel className="p-0 font-normal">
                 <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                   <Avatar className="h-8 w-8 rounded-lg">
-                     <AvatarImage src={currentUser.avatar || `https://github.com/${currentUser.username}.png`} alt={currentUser.username} />
+                     <AvatarImage src={/*currentUser.avatar ||*/ `https://github.com/${currentUser.username}.png`} alt={currentUser.username} />
                     <AvatarFallback className="rounded-lg">{currentUser.username ? currentUser.username.charAt(0).toUpperCase() : ''}</AvatarFallback>
                   </Avatar>
                   <div className="grid flex-1 text-left text-sm leading-tight">

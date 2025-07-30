@@ -1,10 +1,10 @@
 // src/pages/ContestDetailPage.tsx
 import { useState, useCallback, useEffect } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { useFetch } from '@/hooks/use-fetch';
 import { getContestById, registerForContest, getMe } from '@/api';
 import type { Contest, UserProfile } from '@/types';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -13,13 +13,10 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { 
   Trophy, 
-  Clock, 
   Users, 
   Info,
   List,
   BarChart,
-  Code,
-  Lock,
   LogIn,
   UserPlus
 } from 'lucide-react';
@@ -29,7 +26,6 @@ import { getDifficultyVariant } from '@/utils/ui-helpers';
 
 export default function ContestDetailPage() {
   const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
   const [password, setPassword] = useState('');
   const [registering, setRegistering] = useState(false);
   const [currentUser, setCurrentUser] = useState<UserProfile | null>(null);

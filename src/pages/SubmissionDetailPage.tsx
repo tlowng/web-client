@@ -1,4 +1,3 @@
-// src/pages/SubmissionDetailPage.tsx - FINALIZED VERSION
 import { useEffect, useState, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { getSubmissionById } from '@/api';

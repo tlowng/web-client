@@ -1,4 +1,3 @@
-// src/pages/ContestsPage.tsx
 import { useState, useCallback, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useFetch } from '@/hooks/use-fetch';

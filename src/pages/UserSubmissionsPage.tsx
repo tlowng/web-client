@@ -1,4 +1,3 @@
-// src/pages/UserSubmissionsPage.tsx - FINAL CLEANED VERSION
 import { useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { useFetch } from '@/hooks/use-fetch';

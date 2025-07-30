@@ -10,8 +10,6 @@ import type {
     UserWithProfile, 
     ForumProfile,
     LeaderboardResponse,
-    LeaderboardEntry,
-    ForumProfilePopulated
 } from '@/types';
 
 export const getForumCategories = async () => {

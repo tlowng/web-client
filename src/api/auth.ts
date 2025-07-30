@@ -1,6 +1,6 @@
 // src/api/auth.ts
 import api from './client';
-import type { UserData, AuthResponse, UserProfile, LoginCredentials, RegisterCredentials } from '@/types';
+import type { UserProfile, LoginCredentials, RegisterCredentials } from '@/types';
 
 export const registerUser = (userData: RegisterCredentials): Promise<{ message: string }> => 
   api.post('/auth/signup', userData).then(res => res.data);

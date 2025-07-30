@@ -1,4 +1,3 @@
-// src/pages/ProblemDetailPage.tsx - FIXED VERSION
 import { useState, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import { useFetch } from '@/hooks/use-fetch';
@@ -10,7 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
 import { BookOpen, Clock, MemoryStick, Play, Code, TestTube } from 'lucide-react';
-import MonacoEditor from '@monaco-editor/react'; // Fixed: Use Monaco Editor
+import MonacoEditor from '@monaco-editor/react'; 
 import { toast } from 'sonner';
 import { getDifficultyVariant, getDifficultyColor } from '@/utils/ui-helpers';
 import { useBreadcrumbTitle } from '@/contexts/breadcrumb-context';

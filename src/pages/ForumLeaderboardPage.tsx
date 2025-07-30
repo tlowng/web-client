@@ -1,4 +1,3 @@
-// src/pages/ForumLeaderboardPage.tsx - FIXED VERSION
 import { useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { useFetch } from '@/hooks/use-fetch';
