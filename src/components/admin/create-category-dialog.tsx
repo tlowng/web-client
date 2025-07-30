@@ -21,7 +21,7 @@ export function CreateCategoryDialog({ children, onCategoryCreated }: CreateCate
     description: '',
     icon: '📁',
     color: '#3B82F6',
-    order: 1
+    order: 1,
   });
 
   const handleSubmit = async (e: React.FormEvent) => {

@@ -106,7 +106,7 @@ export function TopicList({ topics, loading, error, onRetry }: TopicListProps) {
             </TableCell>
             <TableCell className="text-right">
               <div className="text-sm">
-                {(topic.postCount || topic.replyCount || 0)} replies
+                {( topic.replyCount || 0)} replies
               </div>
               <div className="text-sm">
                 {topic.viewCount} views

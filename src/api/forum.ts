@@ -18,10 +18,17 @@ export const getForumCategories = async () => {
     return response.data.data;
 };
 
-export const createForumCategory = async (data: Omit<ForumCategory, '_id' | 'slug' | 'topicCount' | 'postCount'>) => {
-    const response = await api.post<ApiResponse<ForumCategory>>('/forum/categories', data);
-    return response.data.data;
-}
+export const createForumCategory = async (data: {
+  name: string;
+  description: string;
+  icon: string;
+  color: string;
+  order: number;
+}) => {
+  const response = await api.post<ApiResponse<ForumCategory>>('/forum/categories', data);
+  return response.data.data;
+};
+
 
 export const getCategoryBySlug = async (slug: string) => {
     const response = await api.get<ApiResponse<ForumCategory>>(`/forum/categories/${slug}`);
