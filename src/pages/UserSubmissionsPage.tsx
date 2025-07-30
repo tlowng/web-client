@@ -269,7 +269,7 @@ export default function UserSubmissionsPage() {
                       {submission.memoryUsed ? (
                         <div className="flex items-center justify-center gap-1">
                           <MemoryStick className="h-4 w-4 text-muted-foreground" />
-                          <span className="text-sm">{submission.memoryUsed}MB</span>
+                          <span className="text-sm">{submission.memoryUsed}kb</span>
                         </div>
                       ) : (
                         <span className="text-muted-foreground">-</span>
@@ -284,16 +284,18 @@ export default function UserSubmissionsPage() {
                     </TableCell>
                     
                     <TableCell>
-                      <Button 
-                        size="sm" 
-                        variant="outline"
-                        onClick={() => {
-                          // Could implement view code functionality
-                          console.log('View code for submission:', submission._id);
-                        }}
+
+                     <Link 
+                        to={`/submissions/${submission._id}`}
+                        className="font-medium hover:text-primary transition-colors"
                       >
-                        View
-                      </Button>
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                        >
+                          View
+                        </Button>
+                      </Link>
                     </TableCell>
                   </TableRow>
                 ))}

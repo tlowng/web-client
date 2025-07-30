@@ -13,7 +13,7 @@ export interface BreadcrumbItem {
 const routeConfig: Record<string, { title: string; parent?: string }> = {
   '/': { title: 'Forum' },
   '/forum/:slug': { title: 'Category', parent: '/' },
-  '/forum/topic/:slug': { title: 'Topic', parent: '/' },
+  '/forum/topic/:slug': { title: 'Topic', parent: '/forum' },
   '/problems': { title: 'Problems', parent: '/' },
   '/problems/:id': { title: 'Problem Detail', parent: '/problems' },
   '/submissions/user-submissions': { title: 'My Submissions', parent: '/' },

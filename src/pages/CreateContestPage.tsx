@@ -3,7 +3,7 @@ import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useFetch } from '@/hooks/use-fetch';
 import { createContest, getProblems } from '@/api';
-import type { ContestFormData, ProblemData, ContestType, ScoringSystem, ProblemsListResponse } from '@/types';
+import type { ContestFormData, ContestType, ScoringSystem, ProblemsListResponse } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';

@@ -155,7 +155,7 @@ export default function SubmissionDetailPage() {
             </div>
             <div>
               <p className="font-medium">User:</p>
-              <Link to={`/forum/users/${submission.userId._id}`} className="text-blue-500 hover:underline">
+              <Link to={`/forum/profile/${submission.userId._id}`} className="text-blue-500 hover:underline">
                 {submission.userId.username}
               </Link>
             </div>
