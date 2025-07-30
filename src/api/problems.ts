@@ -1,10 +1,10 @@
 // src/api/problems.ts
 import api from './client';
-import type { ProblemData, CreateProblemResponse } from '@/types';
+import type { ProblemData, CreateProblemResponse  } from '@/types';
 
 export const getProblemById = (id: string) => api.get<ProblemData>(`/problems/${id}`).then(res => res.data);
 
-export const createProblem = async (problemData: Omit<ProblemData, '_id' | 'createdAt' | 'updatedAt'>): Promise<CreateProblemResponse> => {
+export const createProblem = async (problemData: Omit<ProblemData, '_id' | 'createdAt' | 'updatedAt' | 'difficulty'>): Promise<CreateProblemResponse> => {
     console.log('Creating problem with data:', problemData);
     
     // Validate required fields
